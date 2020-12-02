@@ -5,19 +5,19 @@
 #include <memory>
 #include <cassert>
 
-template <class T>
+template <class S, class T>
 class AVLTree {
 private:
 
-    std::shared_ptr<TreeNode<T>> root;
+    std::shared_ptr<TreeNode<S,T>> root;
 
-    static void DestroyTree(std::shared_ptr<TreeNode<T>> &current);
-    static void RollRight(TreeNode<T> &root);
-    static void RollLeft(TreeNode<T> &root);
+    static void DestroyTree(std::shared_ptr<TreeNode<S,T>> &current);
+    static void RollRight(TreeNode<S,T> &root);
+    static void RollLeft(TreeNode<S,T> &root);
 
-    void BalanceUpwards(TreeNode<T> &root);
+    void BalanceUpwards(TreeNode<S,T> &leaf);
 
-    TreeNode<T> GetNode(int key);
+    TreeNode<S,T> GetNode(const S &key);
 
 public:
 
@@ -26,50 +26,56 @@ public:
     AVLTree & operator=(const AVLTree &other) = delete;
     ~AVLTree();
 
-    void Insert(int key, T& data);
-    void Remove(int key);
-    T& GetItem(int key);
+    void Insert(const S &key, const T &data);
+    void Remove(const S &key);
+    T& GetItem(const S &key);
 };
 
-template <class T>
-AVLTree<T>::~AVLTree()
+template <class S, class T>
+AVLTree<S,T>::~AVLTree()
 {
     DestroyTree(root);
     root = nullptr;
 }
 
-template <class T>
-void AVLTree<T>::Insert(int key, T& data)
+template <class S, class T>
+void AVLTree<S,T>::Insert(const S &key,const  T &data)
 {
-    TreeNode<T> newNode(key,data);
-    TreeNode<T> parent = GetNode(key);
+    TreeNode<S,T> newNode(key, data);
+    TreeNode<S,T> parent = GetNode(key);
     if (key == parent.key) {
         parent.data = data;
         return;
     }
     if (key < parent.key) {
         assert(parent.left == nullptr);
-        parent.connectReft(newNode);
+        parent.connectLeft(newNode);
     } else {
         assert(parent.right == nullptr);
         parent.connectRight(newNode);
     }
-    balanceUpwards(newNode);TODO;
+    balanceUpwards(newNode);
 }
 
-template <class T>
-void AVLTree<T>::DestroyTree(std::shared_ptr<TreeNode<T>> &current)
+template <class S, class T>
+T& AVLTree<S,T>::GetItem(const S &key)
+{
+    return GetNode(key).data;
+}
+
+template <class S, class T>
+void AVLTree<S,T>::DestroyTree(std::shared_ptr<TreeNode<S,T>> &current)
 {
     if (current == nullptr) {
         return;
     }
-    std::shared_ptr<TreeNode<T>> left = current->left;
+    std::shared_ptr<TreeNode<S,T>> left = current->left;
     if(left != nullptr) {
         left->top = nullptr;
         current->left = nullptr;
     }
     DestroyTree(left);
-    std::shared_ptr<TreeNode<T>> right = current->right;
+    std::shared_ptr<TreeNode<S,T>> right = current->right;
     if (right != nullptr) {
         right->top = nullptr;
         current->right = nullptr;
@@ -77,31 +83,55 @@ void AVLTree<T>::DestroyTree(std::shared_ptr<TreeNode<T>> &current)
     DestroyTree(right);
 }
 
-template <class T>
-void AVLTree<T>::RollRight(TreeNode<T> &root)
+template <class S, class T>
+void AVLTree<S,T>::RollRight(TreeNode<S,T> &root)
 {
-    std::shared_ptr<TreeNode<T>> left = root->left;
-    std::shared_ptr<TreeNode<T>> swing = left->right;
-    root->connectReft(*swing);
+    std::shared_ptr<TreeNode<S,T>> left = root->left;
+    std::shared_ptr<TreeNode<S,T>> swing = left->right;
+    root->connectLeft(*swing);
     left->connectRight(*root);
     left.top = nullptr;
 }
 
-template <class T>
-void AVLTree<T>::RollLeft(TreeNode<T> &root)
+template <class S, class T>
+void AVLTree<S,T>::RollLeft(TreeNode<S,T> &root)
 {
-    TreeNode<T> right = root.right;
-    TreeNode<T> swing = right.left;
+    TreeNode<S,T> right = root.right;
+    TreeNode<S,T> swing = right.left;
     root.connectRight(swing);
-    right.connectReft(root);
+    right.connectLeft(root);
     right.top = nullptr;
 }
 
-template <class T>
-TreeNode<T> AVLTree<T>::GetNode(int key)
+template <class S, class T>
+void AVLTree<S,T>::BalanceUpwards(TreeNode<S,T> &leaf)
 {
-    std::shared_ptr<TreeNode<T>> current = root;
-    std::shared_ptr<TreeNode<T>> parent = current;
+    TreeNode<S,T> index = leaf;
+    while(true) {
+        if (index.balanceFactor() == 2) {
+            if (index.left->balanceFactor() == -1) {
+                RollLeft(*(index.left));
+            }
+            RollRight(index);
+        } else if (index.balanceFactor() == -2) {
+            if (index.right->balanceFactor() == 1) {
+                RollRight(*(index.right));
+            }
+            RollLeft(index);
+        }
+        index.update_height();
+        if (index.top == nullptr) {
+            break;
+        }
+        index = *(index.top);
+    }
+}
+
+template <class S, class T>
+TreeNode<S,T> AVLTree<S,T>::GetNode(const S &key)
+{
+    std::shared_ptr<TreeNode<S,T>> current = root;
+    std::shared_ptr<TreeNode<S,T>> parent = current;
     while(current != nullptr) {
         if (key == current->key) {
             return current;

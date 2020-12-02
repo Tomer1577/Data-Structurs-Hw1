@@ -5,11 +5,11 @@
 
 #include <memory>
 
-template <class T>
+template <class S, class T>
 struct TreeNode {
 public:
 
-    const int key;
+    const S key;
     T data;
     std::shared_ptr<TreeNode> top;
     std::shared_ptr<TreeNode> left;
@@ -17,7 +17,7 @@ public:
     int height;
 
     TreeNode() = delete;
-    explicit TreeNode(int key, const T &data) noexcept: key(key), data(data), top(nullptr), left(nullptr), right(nullptr)
+    explicit TreeNode(const S &key, const T &data) noexcept: key(key), data(data), top(nullptr), left(nullptr), right(nullptr)
     {
         height = 0;
     }
@@ -46,13 +46,18 @@ public:
         return key>other.key;
     }
 
+    void update_height() {
+        int leftHeight = (left == nullptr)? NULL_HEIGHT : left->height;
+        int rightHeight = (right == nullptr)? NULL_HEIGHT : right->height;
+        height = leftHeight>rightHeight? 1 + leftHeight : 1 + rightHeight;
+    }
     int balanceFactor()
     {
         int leftHeight = (left == nullptr)? NULL_HEIGHT : left->height;
         int rightHeight = (right == nullptr)? NULL_HEIGHT : right->height;
         return leftHeight-rightHeight;
     }
-    void connectReft(TreeNode &other)
+    void connectLeft(TreeNode &other)
     {
         other.top = this;
         this->left = &other;
