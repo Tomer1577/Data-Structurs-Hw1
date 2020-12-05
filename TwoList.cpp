@@ -25,7 +25,7 @@ TwoList& TwoList::operator=(const TwoList& other)
                 previous = previous->right;
             }
         }
-        //can't throw exceptions from here
+
         DestroyList(first);
         first = newFirst;
         last = previous;

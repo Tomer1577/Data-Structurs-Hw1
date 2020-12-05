@@ -17,10 +17,8 @@ public:
     int height;
 
     TreeNode() = delete;
-    explicit TreeNode(const S &key, const T &data) noexcept: key(key), data(data), top(nullptr), left(nullptr), right(nullptr)
-    {
-        height = 0;
-    }
+    explicit TreeNode(const S &key, const T &data) noexcept:
+        key(key), data(data), top(nullptr), left(nullptr), right(nullptr), height(0) {}
     TreeNode(const TreeNode &other) = default;
     TreeNode& operator=(const TreeNode &other) = default;
     ~TreeNode() = default;
