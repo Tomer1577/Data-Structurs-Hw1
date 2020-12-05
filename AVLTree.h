@@ -15,9 +15,9 @@ private:
     static void RollRight(TreeNode<S,T> &root);
     static void RollLeft(TreeNode<S,T> &root);
 
-    void BalanceUpwards(TreeNode<S,T> &leaf);
+    void BalanceUpwards(TreeNode<S,T> &start);
 
-    TreeNode<S,T> GetNode(const S &key);
+    TreeNode<S,T>& GetNode(const S &key);
 
 public:
 
@@ -27,7 +27,7 @@ public:
     ~AVLTree();
 
     T& GetItem(const S &key);
-    void Insert(const S &key, const T &data);//this needs to be AVLtree type no to return the nrew tree no?
+    void Insert(const S &key, const T &data);
     void Remove(const S &key);
     
 };
@@ -82,9 +82,9 @@ void AVLTree<S,T>::RollLeft(TreeNode<S,T> &root)
 }
 
 template <class S, class T>
-void AVLTree<S,T>::BalanceUpwards(TreeNode<S,T> &leaf)
+void AVLTree<S,T>::BalanceUpwards(TreeNode<S,T> &start)
 {
-    TreeNode<S,T> index = leaf;
+    TreeNode<S,T> index = start;
     while(true) {
         if (index.balanceFactor() == 2) {
             if (index.left->balanceFactor() == -1) {
@@ -106,7 +106,7 @@ void AVLTree<S,T>::BalanceUpwards(TreeNode<S,T> &leaf)
 }
 
 template <class S, class T>
-TreeNode<S,T> AVLTree<S,T>::GetNode(const S &key)
+TreeNode<S,T>& AVLTree<S,T>::GetNode(const S &key)
 {
     std::shared_ptr<TreeNode<S,T>> current = root;
     std::shared_ptr<TreeNode<S,T>> parent = current;
@@ -133,12 +133,12 @@ T& AVLTree<S,T>::GetItem(const S &key)
 template <class S, class T>
 void AVLTree<S,T>::Insert(const S &key,const  T &data)
 {
-    TreeNode<S,T> newNode(key, data);
     TreeNode<S,T> parent = GetNode(key);
-    if (key == parent.key) {
-        parent.data = data;
+    if (key == parent.key) {//item already exists
+        TODO;//throw
         return;
     }
+    TreeNode<S,T> newNode(key, data);
     if (key < parent.key) {
         assert(parent.left == nullptr);
         parent.connectLeft(newNode);
@@ -150,63 +150,60 @@ void AVLTree<S,T>::Insert(const S &key,const  T &data)
 }
 
 template <class S, class T>
-void AVLTree<S,T>::Remove(const S &key)//needs to be type AVLTree i think
-//the plan is to add back the small one and go down the small one untill i find a place absolute worst time for that time is log n i think
-//then start balance from the connected one
+void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
 {
-    TreeNode<S,T> to_remove = GetNode(key);
-    if(to_remove.key != key)
-    {
-        //throw no such node
-        //for now:
+    TreeNode<S,T> toRemove = GetNode(key);
+    if(toRemove.key != key) {//item not found
+        TODO;//throw
         return;
     }
-    std::shared_ptr<TreeNode<S,T>> parent = to_remove.top;
-    std::shared_ptr<TreeNode<S,T>> left = to_remove.left;
-    std::shared_ptr<TreeNode<S,T>> right = to_remove.right;
-    bool side = (parent -> right).key  == key;//should test this works!!
-    if (left == nullptr && right == nullptr)
+    std::shared_ptr<TreeNode<S,T>> parent = toRemove.top;
+    std::shared_ptr<TreeNode<S,T>> left = toRemove.left;
+    std::shared_ptr<TreeNode<S,T>> right = toRemove.right;
+    bool isRightChild = parent->right->key == key;
+    if (left == nullptr && right == nullptr)//item is a leaf
     {
-        balanceUpwards(parent);
-        std::shared_ptr<TreeNode<S,T>> to_free = side? *(parent).right : *(parent).left;
-        delete(to_free);//is this how you do it ? do i need to put null where i freed???
-        return;
-    }
-
-    TreeNode<S,T> current = side ? *left : *right;//start with the opposite side
-    if(current != nullptr)
-    {
-        std::shared_ptr<TreeNode<S,T>> current_side = side ? current.right : current.left;
-        while(current_side != nullptr)
-        {
-            current = *(current_side);
-            current_side = side ? current.right : current.left;
+        if (isRightChild) {
+            parent->right = nullptr;
+        } else {
+            parent->left = nullptr;
         }
+        balanceUpwards(parent);
+        return;
     }
-    if(side)//add combin original children to one.
-    {
-        current.right = right;
-        int leftHeight = (left == nullptr)? NULL_HEIGHT : left->height;
-        current.height = leftHeight>(right -> hight) ? leftHeight : (right -> hight);
+    if (left == nullptr) {
+        assert(right != nullptr);
+        if (isRightChild) {
+            parent->right = right;
+            right->top = parent;
+        } else {
+            parent->left = right;
+            right->top = parent;
+        }
+        BalanceUpwards(*right);//note that right's subtree is unaffected by the function, so it can start with right
+        return;
     }
-    else
-    {
-        current.left = left;   
-        int rightHeight = (right == nullptr)? NULL_HEIGHT : right->height;
-        current.height = rightHeight>(left -> hight) ? rightHeight : (left -> hight);
+    if (right == nullptr) {
+        assert(left != nullptr);
+        if (isRightChild) {
+            parent->right = left;
+            left->top = parent;
+        } else {
+            parent->left = left;
+            left->top = parent;
+        }
+        BalanceUpwards(*left);//refer to the comment on (left == null) block
+        return;
     }
-
-    std::shared_ptr<TreeNode<S,T>> to_free = side? *(parent).right : *(parent).left;
-    if(side)
-    {
-        *(parent).right = left;
+    assert(left != nullptr && right != nullptr);
+    std::shared_ptr<TreeNode<S,T>> temp = right;
+    while (temp->left != nullptr) {
+        temp = temp->left;
     }
-    else
-    {
-        *(parent).left = right;   
-    }
-    delete(to_free);//is this how you do it ?
-    balanceUpwards(current);
-    return;
+    toRemove.data = temp->data;
+    temp = temp->top;
+    temp->left = temp->left->right;
+    temp = temp->left;
+    BalanceUpwards(*temp);
 }
 #endif //AVLTREE_H
