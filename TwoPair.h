@@ -22,6 +22,11 @@ public:
     {
         return (courseId == other.courseId) && (classId == other.classId);
     }
+
+    bool operator!=(const TwoPair& other) const
+    {
+        return (courseId != other.courseId) && (classId != other.classId);
+    }
 };
 
 
