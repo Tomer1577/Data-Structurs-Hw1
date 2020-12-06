@@ -4,6 +4,8 @@
 #include "TimeTreekey.h"
 #include "AVLTree.h"
 #include "TwoList.h"
+#include "Array.h"
+#include "TimeTreeKey.h"
 
 class CoursesManager
 {

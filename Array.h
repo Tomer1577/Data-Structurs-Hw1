@@ -11,7 +11,13 @@ public:
     Array() = delete;
     explicit Array(int size) : size(size)
     {
-        data = new ClassData[size]();
+        try{
+            data = new ClassData[size]();
+        }
+        catch(const std::exception& e)
+        {
+            TODO;//throw our memory allocation error
+        }
     }
     Array(const Array &other);
     Array& operator=(const Array &other);
