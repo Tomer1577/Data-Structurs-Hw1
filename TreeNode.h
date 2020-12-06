@@ -9,7 +9,7 @@ template <class S, class T>
 struct TreeNode {
 public:
 
-    const S key;
+    S key;
     T data;
     std::shared_ptr<TreeNode> top;
     std::shared_ptr<TreeNode> left;

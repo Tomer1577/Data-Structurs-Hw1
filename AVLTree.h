@@ -157,6 +157,7 @@ void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
         TODO;//throw
         return;
     }
+    TODO//what if root is removed?
     bool isRightChild = key > toRemove.top->key;
     if ( toRemove.left == nullptr &&  toRemove.right == nullptr)
     {
@@ -172,7 +173,7 @@ void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
     }
     if (toRemove.left == nullptr) {
         assert(toRemove.right != nullptr);
-        std::shared_ptr<TreeNode<S,T>> temp = toRemove.right;
+        std::shared_ptr<TreeNode<S,T>> temp = toRemove.top;
         if (isRightChild) {
             toRemove.top->connectRight(toRemove.right);
         } else {
@@ -185,7 +186,7 @@ void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
     }
     if (toRemove.right == nullptr) {
         assert(toRemove.left != nullptr);
-        std::shared_ptr<TreeNode<S,T>> temp = toRemove.left;
+        std::shared_ptr<TreeNode<S,T>> temp = toRemove.top;
         if (isRightChild) {
             toRemove.top->connectRight(toRemove.left);
         } else {
@@ -204,6 +205,7 @@ void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
         temp = temp->left;
     }
     toRemove.data = temp->data;
+    toRemove.key = temp->key;
     std::shared_ptr<TreeNode<S,T>> parent = temp->top;
     if (hasMoved) {
         parent->left = temp->right;
@@ -212,7 +214,7 @@ void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
         }
         temp->top = nullptr;
         temp->right = nullptr;
-        BalanceUpwards(parent->left);
+        BalanceUpwards(*parent);
     } else {
         parent->right = temp->right;
         if (temp->right != nullptr) {
@@ -220,9 +222,7 @@ void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
         }
         temp->top = nullptr;
         temp->right = nullptr;
-        BalanceUpwards(parent->right);
+        BalanceUpwards(*parent);
     }
-    /*
-     */
 }
 #endif //AVLTREE_H

@@ -1,25 +1,24 @@
 #include "Array.h"
 
+Array::Array(const Array &other): size(other.size)
+{
+    data = new ClassData[size]();
+    for (int i = 0; i < size; ++i) {
+        data[i] = other.data[i];
+    }
+}
+
 Array& Array::operator=(const Array &other)
 {
-    try
-    {
-        ClassData* newData = new ClassData[other.size]();
-        for (int i = 0; i < other.size; ++i) {
-        newData[i] = other[i];
-        }
-            delete[] data;
-            size = other.size;
-            data = newData;
-            return *this;
-        }
-    catch(const std::exception& e)
-    {
-        TODO;//trow our exception memory
+    ClassData* newData = new ClassData[other.size]();
+    for (int i = 0; i < other.size; ++i) {
+        newData[i] = other.data[i];
     }
-    
-    
-    
+
+    delete[] data;
+    size = other.size;
+    data = newData;
+    return *this;
 }
 
 Array::~Array()
