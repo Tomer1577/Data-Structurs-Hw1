@@ -1,11 +1,11 @@
 #include "CoursesManager.h"
-
+#include "StatusType.h"
 StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)
 {
     Array classArray(numOfClasses);
     if(courseID<=0 || numOfClasses<=0)
     {
-        //throw
+        return INVALID_INPUT;
     }
     (this->courses).Insert(courseID,classArray);
     for(int i = 0; i < numOfClasses; i++)
@@ -14,7 +14,7 @@ StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)
         (classArray[i]).timeViewed = 0;
     }
     (this->courses).GetItem(courseID) = classArray;
-    return;//SUCCESS
+    return SUCCESS;//SUCCESS
     
 }
 
@@ -22,7 +22,7 @@ StatusType CoursesManager::RemoveCourse(int courseID)
 {
     if(courseID <= 0)
     {
-        return;//trow invalid
+        return INVALID_INPUT;
     }
     Array& currentCourse = (this->courses).GetItem(courseID);
     for(int i = 0; i < currentCourse.GetSize(); i++)
@@ -36,25 +36,25 @@ StatusType CoursesManager::RemoveCourse(int courseID)
         else
         {
             TimeTreeKey key((currentCourse[i]).timeViewed,courseID,i);
-            (this.classes).Remove(key);
+            (this->classes).Remove(key);
         }
     }
     (this->courses).Remove(courseID);
-    return;//SUCCESS
+    return SUCCESS;//SUCCESS
 }
 
 StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
 {
     if(courseID <= 0 || classID <0 ||time <=0)
     {
-        return;//trow invalid
+        return FAILURE;//fail statuse
     }
     Array& currentCourse = (this->courses).GetItem(courseID);
     if((currentCourse[classID]).pointer != nullptr)
     {
         (this->unwatched).PopPtr((currentCourse[classID]).pointer);
         (currentCourse[classID]).pointer = nullptr;
-        TimeTreeKey key((time,courseID,classID);
+        TimeTreeKey key(time,courseID,classID);
         (this->classes).Insert(key,key);
         (currentCourse[classID]).timeViewed = time;
     }
@@ -72,8 +72,9 @@ StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
 StatusType CoursesManager::TimeViewed(int courseID, int classID, int *timeViewed)
 {
     if (classID < 0 || courseID <= 0) {
-        TODO; //throw
+        INVALID_INPUT; //throw
     }//THIS THROW MIGHT BE WRONG
-    Array &course = courses.GetItem(courseID);
-    return course[classID].timeViewed;
+    Array& course = courses.GetItem(courseID);
+    *timeViewed = (course[classID]).timeViewed;
+    return SUCCESS;
 }
