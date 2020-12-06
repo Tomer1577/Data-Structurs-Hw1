@@ -1,7 +1,7 @@
 #ifndef COURSESM
 #define COURSESM
 
-#include "TimeTreekey.h"
+#include "TimeTreeKey.h"
 #include "AVLTree.h"
 #include "TwoList.h"
 #include "Array.h"
