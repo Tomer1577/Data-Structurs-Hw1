@@ -157,53 +157,72 @@ void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
         TODO;//throw
         return;
     }
-    std::shared_ptr<TreeNode<S,T>> parent = toRemove.top;
-    std::shared_ptr<TreeNode<S,T>> left = toRemove.left;
-    std::shared_ptr<TreeNode<S,T>> right = toRemove.right;
-    bool isRightChild = parent->right->key == key;
-    if (left == nullptr && right == nullptr)//item is a leaf
+    bool isRightChild = key > toRemove.top->key;
+    if ( toRemove.left == nullptr &&  toRemove.right == nullptr)
     {
         if (isRightChild) {
-            parent->right = nullptr;
+            toRemove.top->right = nullptr;
         } else {
-            parent->left = nullptr;
+            toRemove.top->left = nullptr;
         }
-        balanceUpwards(parent);
+        std::shared_ptr<TreeNode<S,T>> temp = toRemove.top;
+        toRemove.top = nullptr;
+        BalanceUpwards(*temp);
         return;
     }
-    if (left == nullptr) {
-        assert(right != nullptr);
+    if (toRemove.left == nullptr) {
+        assert(toRemove.right != nullptr);
+        std::shared_ptr<TreeNode<S,T>> temp = toRemove.right;
         if (isRightChild) {
-            parent->right = right;
-            right->top = parent;
+            toRemove.top->connectRight(toRemove.right);
         } else {
-            parent->left = right;
-            right->top = parent;
+            toRemove.top->connectLeft(toRemove.right);
         }
-        BalanceUpwards(*right);//note that right's subtree is unaffected by the function, so it can start with right
+        toRemove.top = nullptr;
+        toRemove.right = nullptr;
+        BalanceUpwards(*temp);//note that right's subtree is unaffected by the function, so it can start with right
         return;
     }
-    if (right == nullptr) {
-        assert(left != nullptr);
+    if (toRemove.right == nullptr) {
+        assert(toRemove.left != nullptr);
+        std::shared_ptr<TreeNode<S,T>> temp = toRemove.left;
         if (isRightChild) {
-            parent->right = left;
-            left->top = parent;
+            toRemove.top->connectRight(toRemove.left);
         } else {
-            parent->left = left;
-            left->top = parent;
+            toRemove.top->connectLeft(toRemove.left);
         }
-        BalanceUpwards(*left);//refer to the comment on (left == null) block
+        toRemove.top = nullptr;
+        toRemove.left = nullptr;
+        BalanceUpwards(*temp);//refer to the comment on (left == null) block
         return;
     }
-    assert(left != nullptr && right != nullptr);
-    std::shared_ptr<TreeNode<S,T>> temp = right;
+    assert(toRemove.left != nullptr && toRemove.right != nullptr);
+    std::shared_ptr<TreeNode<S,T>> temp = toRemove.right;
+    bool hasMoved = false;
     while (temp->left != nullptr) {
+        hasMoved = true;
         temp = temp->left;
     }
     toRemove.data = temp->data;
-    temp = temp->top;
-    temp->left = temp->left->right;
-    temp = temp->left;
-    BalanceUpwards(*temp);
+    std::shared_ptr<TreeNode<S,T>> parent = temp->top;
+    if (hasMoved) {
+        parent->left = temp->right;
+        if (temp->right != nullptr) {
+            temp->right->top = parent;
+        }
+        temp->top = nullptr;
+        temp->right = nullptr;
+        BalanceUpwards(parent->left);
+    } else {
+        parent->right = temp->right;
+        if (temp->right != nullptr) {
+            temp->right->top = parent;
+        }
+        temp->top = nullptr;
+        temp->right = nullptr;
+        BalanceUpwards(parent->right);
+    }
+    /*
+     */
 }
 #endif //AVLTREE_H
