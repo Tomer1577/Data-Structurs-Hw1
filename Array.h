@@ -31,6 +31,7 @@ public:
         }
         return data[x];
     };
+    int GetSize();
 };
 
 

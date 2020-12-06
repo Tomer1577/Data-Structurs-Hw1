@@ -4,13 +4,16 @@ StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)
 {
     Array classArray(numOfClasses);
     if(courseID<=0 || numOfClasses<=0)
-    (this.courses).insert(courseID,classArray);
+    {
+        //throw
+    }
+    (this->courses).Insert(courseID,classArray);
     for(int i = 0; i < numOfClasses; i++)
     {
-        (classArray[i]).pointer= (this.unwatched).PushFront(courseID,i);
-        //(classArray[i]).numberOfViews =0;????????????????????????
+        (classArray[i]).pointer= (this->unwatched).PushFront(courseID,i);
+        (classArray[i]).timeViewed = 0;
     }
-    (this.courses).GetData(courseID) = classArray;
+    (this->courses).GetItem(courseID) = classArray;
     return;//SUCCESS
     
 }
@@ -21,22 +24,22 @@ StatusType CoursesManager::RemoveCourse(int courseID)
     {
         return;//trow invalid
     }
-    Array currentCourse = (this.courses).GetData(courseID);
-    for(int i = 0; i < currentCourse.size; i++)
+    Array& currentCourse = (this->courses).GetItem(courseID);
+    for(int i = 0; i < currentCourse.GetSize(); i++)
     {
         if((currentCourse[i]).pointer != nullptr)
         {
             
-            (this.unwatched).PopPtr((currentCourse[i]).pointer);
+            (this->unwatched).PopPtr((currentCourse[i]).pointer);
             (currentCourse[i]).pointer = nullptr;
         }
         else
         {
-            TimeTreeKey key((currentCourse[i]).time,courseID,i);
+            TimeTreeKey key((currentCourse[i]).timeViewed,courseID,i);
             (this.classes).Remove(key);
         }
     }
-    (this.courses).remove(courseID);
+    (this->courses).Remove(courseID);
     return;//SUCCESS
 }
 
@@ -46,18 +49,22 @@ StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
     {
         return;//trow invalid
     }
-    Array currentCourse = (this.courses).GetData(courseID);
+    Array& currentCourse = (this->courses).GetItem(courseID);
     if((currentCourse[classID]).pointer != nullptr)
     {
-        (this.unwatched).PopPtr((currentCourse[classID]).pointer);
+        (this->unwatched).PopPtr((currentCourse[classID]).pointer);
         (currentCourse[classID]).pointer = nullptr;
-        TimeTreeKey key((currentCourse[classID]).time,courseID,classID);
-        (this.classes).insert(key,key);
-        //change number of views???????????????
+        TimeTreeKey key((time,courseID,classID);
+        (this->classes).Insert(key,key);
+        (currentCourse[classID]).timeViewed = time;
     }
     else
-    {
-        //remove existing node and read with new time.
+    {        //remove existing node and read with new time.
+        TimeTreeKey key((currentCourse[classID]).timeViewed,courseID,classID);
+        (this->classes).Remove(key);
+        (currentCourse[classID]).timeViewed = (currentCourse[classID]).timeViewed + time;
+        TimeTreeKey newKey((currentCourse[classID]).timeViewed,courseID,classID);
+        (this->classes).Insert(newKey,newKey);
     }
     
 }

@@ -25,3 +25,8 @@ Array::~Array()
 {
     delete[] data;
 }
+
+int Array::GetSize()
+{
+    return this->size;
+}
