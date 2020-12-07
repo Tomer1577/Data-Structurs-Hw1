@@ -71,16 +71,46 @@ StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
 
 StatusType CoursesManager::TimeViewed(int courseID, int classID, int *timeViewed)
 {
+    if (classID < 0 || courseID <= 0) { //not sure where to put this
+        TODO; //???
+    }
     try {
-        if (classID < 0 || courseID <= 0) { //this is in the try block to give priority to std::bad_alloc
-            TODO; //throw
-        }
         Array& course = courses.GetItem(courseID);
         *timeViewed = (course[classID]).timeViewed;
-    }
-    catch (const std::bad_alloc& x) {
+    } catch (const std::bad_alloc& x) {
         return ALLOCATION_ERROR;
     }
     TODO;//continue catching
     return SUCCESS;
+}
+
+StatusType CoursesManager::GetMostViewedClasses(int numOfClasses, int *courses, int *classes)
+{
+    if (numOfClasses <= 0) {
+        return INVALID_INPUT;
+    }
+    try {
+        int counter = 0;
+        for (const TimeTreeKey& item:this->classes) {
+            if (counter == numOfClasses) {
+                return SUCCESS;
+            }
+            courses[counter] = item.courseId;
+            classes[counter] = item.classId;
+            ++counter;
+        }
+        for (const TwoNode& item:unwatched) {
+            if (counter == numOfClasses) {
+                return SUCCESS;
+            }
+            courses[counter] = item.data.courseId;
+            classes[counter] = item.data.classId;
+            ++counter;
+        }
+        if (counter != numOfClasses) {
+            return FAILURE;
+        }
+    } catch (std::bad_alloc) {
+        return ALLOCATION_ERROR;
+    }
 }

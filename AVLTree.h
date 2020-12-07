@@ -2,6 +2,7 @@
 #define AVLTREE_H
 
 #include "TreeNode.h"
+#include "Array.h"
 #include <memory>
 #include <cassert>
 
@@ -18,6 +19,7 @@ private:
     void BalanceUpwards(TreeNode<S,T> &start);
 
     TreeNode<S,T>& GetNode(const S &key);
+    const TreeNode<S,T>& GetNode(const S &key) const;
 
 public:
 
@@ -27,9 +29,199 @@ public:
     ~AVLTree();
 
     T& GetItem(const S &key);
+    const T& GetItem(const S &key) const;
     void Insert(const S &key, const T &data);
     void Remove(const S &key);
-    
+
+    class iterator;
+    iterator begin()
+    {
+        return iterator(root, root->height);
+    }
+    iterator end()
+    {
+        return iterator(nullptr, root->height);
+    }
+    class const_iterator;
+    const_iterator begin() const
+    {
+        return const_iterator(root, root->height);
+    }
+    const_iterator end() const
+    {
+        return const_iterator(nullptr, root->height);
+    }
+};
+
+template <class S, class T>
+class AVLTree<S,T>::iterator {
+private:
+
+    friend class AVLTree<S,T>;
+
+    Array stack;
+    int top;
+    std::shared_ptr<TreeNode<S,T>> current;
+
+    iterator(std::shared_ptr<TreeNode<S,T>> current, int height):
+        current(current), stack(height + 1), top(0) {}
+
+public:
+    iterator() = delete;
+    iterator(const iterator &other) = default;
+    iterator& operator=(const iterator &other)  = default;
+    ~iterator() = default;
+
+    T& operator*()
+    {
+        assert(current != nullptr);
+        return current->data;
+    }
+    iterator& operator++()
+    {
+        assert(current != nullptr);
+        while(true) {
+            if (current == nullptr) {
+                return *this;
+            }
+            if (stack[top].timeViewed == 0) {
+                stack[top].timeViewed = 1;
+                if (current->left != nullptr) {
+                    current = current->left;
+                    ++top;
+                }
+                continue;
+            }
+            if (stack[top].timeViewed == 1) {
+                stack[top].timeViewed = 2;
+                return *this;
+            }
+            if (stack[top].timeViewed == 2) {
+                stack[top].timeViewed = 3;
+                if (current->right != nullptr) {
+                    current = current->right;
+                    ++top;
+                }
+                continue;
+            }
+            if (stack[top].timeViewed == 3) {
+                stack[top].timeViewed = 0;
+                --top;
+                current = current->top;
+                continue;
+            }
+        }
+    }
+    iterator operator++(int)
+    {
+        assert(current != nullptr);
+        iterator output = *this;
+        ++(*this);
+        return output;
+    }
+
+    bool operator==(const iterator& other) const
+    {
+        if (this->current != other.current || this->top != other.top || stack.GetSize() != other.stack.GetSize()) {
+            return false;
+        }
+        for(int i = 0; i < stack.GetSize(); ++i) {
+            if (stack[i].timeViewed != other.stack[i].timeViewed) {
+                return false;
+            }
+        }
+        return true;
+    }
+    bool operator!=(const iterator& other) const
+    {
+        return !((*this)==other);
+    }
+};
+
+template <class S, class T>
+class AVLTree<S,T>::const_iterator {
+private:
+private:
+
+    friend class AVLTree<S,T>;
+
+    Array stack;
+    int top;
+    std::shared_ptr<TreeNode<S,T>> current;
+
+    const_iterator(std::shared_ptr<TreeNode<S,T>> current, int height):
+    current(current), stack(height + 1), top(0) {}
+
+public:
+    const_iterator() = delete;
+    const_iterator(const const_iterator &other) = default;
+    const_iterator& operator=(const const_iterator &other)  = default;
+    ~const_iterator() = default;
+
+    const T& operator*() const
+    {
+        assert(current != nullptr);
+        return current->data;
+    }
+    const_iterator& operator++()
+    {
+        assert(current != nullptr);
+        while(true) {
+            if (current == nullptr) {
+                return *this;
+            }
+            if (stack[top].timeViewed == 0) {
+                stack[top].timeViewed = 1;
+                if (current->left != nullptr) {
+                    current = current->left;
+                    ++top;
+                }
+                continue;
+            }
+            if (stack[top].timeViewed == 1) {
+                stack[top].timeViewed = 2;
+                return *this;
+            }
+            if (stack[top].timeViewed == 2) {
+                stack[top].timeViewed = 3;
+                if (current->right != nullptr) {
+                    current = current->right;
+                    ++top;
+                }
+                continue;
+            }
+            if (stack[top].timeViewed == 3) {
+                stack[top].timeViewed = 0;
+                --top;
+                current = current->top;
+                continue;
+            }
+        }
+    }
+    const_iterator operator++(int)
+    {
+        assert(current != nullptr);
+        iterator output = *this;
+        ++(*this);
+        return output;
+    }
+
+    bool operator==(const const_iterator& other) const
+    {
+        if (this->current != other.current || this->top != other.top || stack.GetSize() != other.stack.GetSize()) {
+            return false;
+        }
+        for(int i = 0; i < stack.GetSize(); ++i) {
+            if (stack[i].timeViewed != other.stack[i].timeViewed) {
+                return false;
+            }
+        }
+        return true;
+    }
+    bool operator!=(const const_iterator& other) const
+    {
+        return !((*this)==other);
+    }
 };
 
 template <class S, class T>
@@ -38,8 +230,6 @@ AVLTree<S,T>::~AVLTree()
     DestroyTree(root);
     root = nullptr;
 }
-
-
 
 template <class S, class T>
 void AVLTree<S,T>::DestroyTree(std::shared_ptr<TreeNode<S,T>> &current)
@@ -125,7 +315,32 @@ TreeNode<S,T>& AVLTree<S,T>::GetNode(const S &key)
 }
 
 template <class S, class T>
+const TreeNode<S,T>& AVLTree<S,T>::GetNode(const S &key) const
+{
+    std::shared_ptr<TreeNode<S,T>> current = root;
+    std::shared_ptr<TreeNode<S,T>> parent = current;
+    while(current != nullptr) {
+        if (key == current->key) {
+            return current;
+        }
+        parent = current;
+        if (key < current->key) {
+            current = current->left;
+        } else {
+            current = current->right;
+        }
+    }
+    return *parent;
+}
+
+template <class S, class T>
 T& AVLTree<S,T>::GetItem(const S &key)
+{
+    return GetNode(key).data;
+}
+
+template <class S, class T>
+const T& AVLTree<S,T>::GetItem(const S &key) const
 {
     return GetNode(key).data;
 }
@@ -133,6 +348,7 @@ T& AVLTree<S,T>::GetItem(const S &key)
 template <class S, class T>
 void AVLTree<S,T>::Insert(const S &key,const  T &data)
 {
+    TODO;//what if first node is inserted?
     TreeNode<S,T> parent = GetNode(key);
     if (key == parent.key) {//item already exists
         TODO;//throw
@@ -157,7 +373,7 @@ void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
         TODO;//throw
         return;
     }
-    TODO//what if root is removed?
+    TODO;//what if root is removed?
     bool isRightChild = key > toRemove.top->key;
     if ( toRemove.left == nullptr &&  toRemove.right == nullptr)
     {
