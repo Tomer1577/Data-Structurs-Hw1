@@ -72,15 +72,16 @@ StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
 StatusType CoursesManager::TimeViewed(int courseID, int classID, int *timeViewed)
 {
     if (classID < 0 || courseID <= 0) { //not sure where to put this
-        TODO; //???
+        return INVALID_INPUT;
     }
     try {
         Array& course = courses.GetItem(courseID);
         *timeViewed = (course[classID]).timeViewed;
     } catch (const std::bad_alloc& x) {
         return ALLOCATION_ERROR;
+    } catch (TODO/*not found*/) {
+        return FAILURE
     }
-    TODO;//continue catching
     return SUCCESS;
 }
 
