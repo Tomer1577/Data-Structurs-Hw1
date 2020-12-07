@@ -17,13 +17,13 @@ class CoursesManager
     
     
     public:
-    CoursesManager();//eyal
+    CoursesManager() = default;//eyal
     
     CoursesManager(const CoursesManager &other) = delete;
 
     CoursesManager& operator=(const CoursesManager &other) = delete;
 
-    ~CoursesManager();//eyal
+    ~CoursesManager() = default;//eyal
 
     StatusType AddCourse (int courseID, int numOfClasses);//tomer
 
