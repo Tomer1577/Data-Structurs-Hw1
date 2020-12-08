@@ -375,6 +375,7 @@ T& AVLTree<S,T>::GetItem(const S &key)
 template <class S, class T>
 const T& AVLTree<S,T>::GetItem(const S &key) const
 {
+    TODO;//throw
     return GetNode(key).data;
 }
 

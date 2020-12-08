@@ -80,7 +80,7 @@ StatusType CoursesManager::TimeViewed(int courseID, int classID, int *timeViewed
     } catch (const std::bad_alloc& x) {
         return ALLOCATION_ERROR;
     } catch (TODO/*not found*/) {
-        return FAILURE
+        return FAILURE;
     }
     return SUCCESS;
 }
