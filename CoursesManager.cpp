@@ -1,6 +1,6 @@
 #include "CoursesManager.h"
-#include "StatusType.h"
-StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)
+#include "library.h"
+StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)////add catches finish test do library.cpp do dry
 {
     Array classArray(numOfClasses);
     if(courseID<=0 || numOfClasses<=0)
