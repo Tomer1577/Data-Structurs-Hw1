@@ -9,6 +9,6 @@ class ItemNotFound: public Exception {};
 
 class ItemFound: public Exception {};
 
-class OutOfBound: public Exception {};
+class OutOfBounds: public Exception {};
 
 #endif //WET1_EXCEPTION_H

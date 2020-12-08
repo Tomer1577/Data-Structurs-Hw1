@@ -1,5 +1,6 @@
 #include "CoursesManager.h"
 #include "library.h"
+#include "Exception.h"
 StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)////add catches finish test do library.cpp do dry
 {
     Array classArray(numOfClasses);
@@ -71,7 +72,7 @@ StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
 
 StatusType CoursesManager::TimeViewed(int courseID, int classID, int *timeViewed)
 {
-    if (classID < 0 || courseID <= 0) { //not sure where to put this
+    if (courseID <= 0) {
         return INVALID_INPUT;
     }
     try {
@@ -79,7 +80,9 @@ StatusType CoursesManager::TimeViewed(int courseID, int classID, int *timeViewed
         *timeViewed = (course[classID]).timeViewed;
     } catch (const std::bad_alloc& x) {
         return ALLOCATION_ERROR;
-    } catch (TODO/*not found*/) {
+    } catch (const OutOfBounds& x) {
+        return INVALID_INPUT;
+    } catch (const ItemNotFound& x) {
         return FAILURE;
     }
     return SUCCESS;
@@ -111,7 +114,7 @@ StatusType CoursesManager::GetMostViewedClasses(int numOfClasses, int *courses, 
         if (counter != numOfClasses) {
             return FAILURE;
         }
-    } catch (std::bad_alloc) {
+    } catch (const std::bad_alloc& x) {
         return ALLOCATION_ERROR;
     }
 }

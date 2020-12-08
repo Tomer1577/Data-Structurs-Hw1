@@ -2,6 +2,7 @@
 #define WET1_ARRAY_H
 
 #include "ClassData.h"
+#include "Exception.h"
 
 class Array {
 private:
@@ -20,14 +21,14 @@ public:
     ClassData& operator[](int x)
     {
         if (x < 0 || x>size) {
-            TODO;//throw
+            throw OutOfBounds();
         }
         return data[x];
     };
     const ClassData& operator[](int x) const
     {
         if (x < 0 || x>size) {
-            TODO;//throw
+            throw OutOfBounds();
         }
         return data[x];
     };

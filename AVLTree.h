@@ -3,6 +3,7 @@
 
 #include "TreeNode.h"
 #include "Array.h"
+#include "Exception.h"
 #include <memory>
 #include <cassert>
 
@@ -369,14 +370,21 @@ const TreeNode<S,T>& AVLTree<S,T>::GetNode(const S &key) const
 template <class S, class T>
 T& AVLTree<S,T>::GetItem(const S &key)
 {
-    return GetNode(key).data;
+    TreeNode<S,T>& node =  GetNode(key);
+    if (node.key != key) {
+        throw ItemNotFound();
+    }
+    return node.data;
 }
 
 template <class S, class T>
 const T& AVLTree<S,T>::GetItem(const S &key) const
 {
-    TODO;//throw
-    return GetNode(key).data;
+    TreeNode<S,T>& node =  GetNode(key);
+    if (node.key != key) {
+        throw ItemNotFound();
+    }
+    return node.data;
 }
 
 template <class S, class T>
@@ -387,7 +395,7 @@ void AVLTree<S,T>::Insert(const S &key,const  T &data)
     }
     TreeNode<S,T> parent = GetNode(key);
     if (key == parent.key) {//item already exists
-        TODO;//throw
+        throw ItemFound();
         return;
     }
     TreeNode<S,T> newNode(key, data);
@@ -406,7 +414,7 @@ void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
 {
     TreeNode<S,T> toRemove = GetNode(key);
     if(toRemove.key != key) {//item not found
-        TODO;//throw
+        throw ItemNotFound();
         return;
     }
     if (toRemove == *root) {
