@@ -31,11 +31,11 @@ struct TimeTreeKey
         }
         else if(courseId != other.courseId )
         {
-            return courseId < other.courseId;
+            return courseId > other.courseId;
         }
         else if (classId != other.classId)
         {
-            return classId < other.classId;
+            return classId > other.classId;
         }
         return false;
     }
@@ -47,11 +47,11 @@ struct TimeTreeKey
         }
         else if(courseId != other.courseId )
         {
-            return courseId > other.courseId;
+            return courseId < other.courseId;
         }
         else if (classId != other.classId)
         {
-            return classId > other.classId;
+            return classId < other.classId;
         }
         return false;
 
@@ -64,11 +64,11 @@ struct TimeTreeKey
         }
         else if(courseId != other.courseId )
         {
-            return courseId > other.courseId;
+            return courseId < other.courseId;
         }
         else if(classId != other.classId)
         {
-            return classId > other.classId;
+            return classId < other.classId;
         }
         return true;
     }
@@ -80,11 +80,11 @@ struct TimeTreeKey
         }
         else if(courseId != other.courseId )
         {
-            return courseId < other.courseId;
+            return courseId > other.courseId;
         }
         else if(classId != other.classId)
         {
-            return classId < other.classId;
+            return classId > other.classId;
         }
         return true;
     }
