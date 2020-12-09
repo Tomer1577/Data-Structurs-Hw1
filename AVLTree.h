@@ -391,7 +391,7 @@ template <class S, class T>
 void AVLTree<S,T>::Insert(const S &key,const  T &data)
 {
     if (root == nullptr) {
-        root = std::shared_ptr<TreeNode<S,T>> (TreeNode<S,T>(key, data));
+        root = std::shared_ptr<TreeNode<S,T>> (new TreeNode<S,T>(key, data));
     }
     TreeNode<S,T> parent = GetNode(key);
     if (key == parent.key) {//item already exists

@@ -44,15 +44,13 @@ std::shared_ptr<TwoNode> TwoList::PushFront(int courseId, int classId)
 {
     if (first == nullptr) {
         assert(last == nullptr);
-        TwoNode temp = TwoNode(courseId, classId);
-        first = std::shared_ptr<TwoNode>(&temp);
+        first = std::shared_ptr<TwoNode>(new TwoNode(courseId, classId));
         last = first;
         return first;
     } else {
         assert(last != nullptr && first->left == nullptr);
-        TwoNode temp = TwoNode(courseId, classId);
-        first->left = std::shared_ptr<TwoNode>(&temp);
-        temp.right = first;
+        first->left = std::shared_ptr<TwoNode>(new TwoNode(courseId, classId));
+        first->left->right = first;
         first = first->left;
         return first;
     }
@@ -62,15 +60,13 @@ std::shared_ptr<TwoNode> TwoList::PushBack(int courseId, int classId)
 {
     if (last == nullptr) {
         assert(first == nullptr);
-        TwoNode temp = TwoNode(courseId, classId);
-        last = std::shared_ptr<TwoNode>(&temp);
+        last = std::shared_ptr<TwoNode>(new TwoNode(courseId, classId));
         first = last;
         return last;
     } else {
         assert(first != nullptr && last->right == nullptr);
-        TwoNode temp = TwoNode(courseId, classId);
-        last->right = std::shared_ptr<TwoNode>(&temp);
-        temp.left = last;
+        last->right = std::shared_ptr<TwoNode>(new TwoNode(courseId, classId));
+        last->right->left = last;
         last = last->right;
         return last;
     }
