@@ -1,20 +1,38 @@
 #include "CoursesManager.h"
 #include "library.h"
 #include "Exception.h"
-StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)////add catches finish test do library.cpp do dry
+StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)////finish test do dry and fix iterator
 {
-    Array classArray(numOfClasses);
-    if(courseID<=0 || numOfClasses<=0)
+    if(courseID<=0)
     {
         return INVALID_INPUT;
     }
-    (this->courses).Insert(courseID,classArray);
+    try
+    {
+        Array classArray(numOfClasses);
+    }
+    catch(const Exceptions::OutOfBounds &e)
+    {
+        return INVALID_INPUT;
+    }
+    catch(const std::exception &e)
+    {
+        return ALLOCATION_ERROR;
+    }
+    try
+    {
+        (this->courses).Insert(courseID,classArray);
+    }
+    catch(const std::exception& e)
+    {
+        return FAILURE;
+    }
     for(int i = 0; i < numOfClasses; i++)
     {
         (classArray[i]).pointer= (this->unwatched).PushFront(courseID,i);
         (classArray[i]).timeViewed = 0;
     }
-    (this->courses).GetItem(courseID) = classArray;
+    (this->courses).GetItem(courseID) = classArray;// i dont need another try because i inserted him in this function
     return SUCCESS;//SUCCESS
     
 }
@@ -25,7 +43,18 @@ StatusType CoursesManager::RemoveCourse(int courseID)
     {
         return INVALID_INPUT;
     }
-    Array& currentCourse = (this->courses).GetItem(courseID);
+    try
+    {
+        Array& currentCourse = (this->courses).GetItem(courseID);
+    }
+    catch(const std::exception &e)
+    {
+        if (e == ItemNotFound)
+        {
+            return FAILURE;
+        }
+        return ALLOCATION_ERROR;
+    }
     for(int i = 0; i < currentCourse.GetSize(); i++)
     {
         if((currentCourse[i]).pointer != nullptr)
@@ -48,9 +77,22 @@ StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
 {
     if(courseID <= 0 || classID <0 ||time <=0)
     {
-        return FAILURE;//fail statuse
+        return INVALID_INPUT;//fail statuse
     }
-    Array& currentCourse = (this->courses).GetItem(courseID);
+    try
+    {
+        Array& currentCourse = (this->courses).GetItem(courseID);
+
+    }
+    catch(const std::exception& e)
+    {
+        if (e == ItemNotFound)
+        {
+            return FAILURE;
+        }
+        return ALLOCATION_ERROR;
+    }
+    
     if((currentCourse[classID]).pointer != nullptr)
     {
         (this->unwatched).PopPtr((currentCourse[classID]).pointer);
@@ -65,7 +107,7 @@ StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
         (this->classes).Remove(key);
         (currentCourse[classID]).timeViewed = (currentCourse[classID]).timeViewed + time;
         TimeTreeKey newKey((currentCourse[classID]).timeViewed,courseID,classID);
-        (this->classes).Insert(newKey,newKey);
+        (this->classes).Insert(newKey,newKey);// i dont need to check for dublicates
     }
     
 }
