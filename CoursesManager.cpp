@@ -1,7 +1,7 @@
 #include "CoursesManager.h"
 #include "library.h"
 #include "Exception.h"
-StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)////add catches finish test do library.cpp do dry and fix iterator
+StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)////finish test do dry and fix iterator
 {
     if(courseID<=0)
     {
