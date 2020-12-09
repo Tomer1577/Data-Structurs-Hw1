@@ -2,8 +2,7 @@
 #include "CoursesManager.h"
 void *Init()
 {
-    CoursesManager* DS;
-    DS = new(CoursesManager);
+    CoursesManager* DS = new(CoursesManager);
     return DS;
 }
 

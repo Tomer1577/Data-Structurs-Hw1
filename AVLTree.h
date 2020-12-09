@@ -66,7 +66,10 @@ private:
     std::shared_ptr<TreeNode<S,T>> current;
 
     iterator(std::shared_ptr<TreeNode<S,T>> current, int height):
-        current(current), stack(height + 1), top(0) {}
+        current(current), stack(height + 1), top(0)
+    {
+        ++(*this);
+    }
 
 public:
     iterator() = delete;
@@ -152,7 +155,10 @@ private:
     std::shared_ptr<TreeNode<S,T>> current;
 
     const_iterator(std::shared_ptr<TreeNode<S,T>> current, int height):
-    current(current), stack(height + 1), top(0) {}
+    current(current), stack(height + 1), top(0)
+    {
+        ++(*this);
+    }
 
 public:
     const_iterator() = delete;
@@ -174,8 +180,8 @@ public:
             }
             if (stack[top].timeViewed == 0) {
                 stack[top].timeViewed = 1;
-                if (current->left != nullptr) {
-                    current = current->left;
+                if (current->right != nullptr) {
+                    current = current->right;
                     ++top;
                 }
                 continue;
@@ -186,8 +192,8 @@ public:
             }
             if (stack[top].timeViewed == 2) {
                 stack[top].timeViewed = 3;
-                if (current->right != nullptr) {
-                    current = current->right;
+                if (current->left != nullptr) {
+                    current = current->left;
                     ++top;
                 }
                 continue;
