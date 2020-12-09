@@ -88,8 +88,8 @@ public:
             }
             if (stack[top].timeViewed == 0) {
                 stack[top].timeViewed = 1;
-                if (current->left != nullptr) {
-                    current = current->left;
+                if (current->right != nullptr) {
+                    current = current->right;
                     ++top;
                 }
                 continue;
@@ -100,8 +100,8 @@ public:
             }
             if (stack[top].timeViewed == 2) {
                 stack[top].timeViewed = 3;
-                if (current->right != nullptr) {
-                    current = current->right;
+                if (current->left != nullptr) {
+                    current = current->left;
                     ++top;
                 }
                 continue;
