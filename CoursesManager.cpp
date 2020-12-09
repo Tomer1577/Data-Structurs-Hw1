@@ -105,7 +105,7 @@ StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
     {        //remove existing node and read with new time.
         TimeTreeKey key((currentCourse[classID]).timeViewed,courseID,classID);
         (this->classes).Remove(key);
-        (currentCourse[classID]).timeViewed = (currentCourse[classID]).timeViewed + time;
+        (currentCourse[classID]).timeViewed += time;
         TimeTreeKey newKey((currentCourse[classID]).timeViewed,courseID,classID);
         (this->classes).Insert(newKey,newKey);// i dont need to check for dublicates
     }
