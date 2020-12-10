@@ -53,6 +53,7 @@ StatusType GetMostViewedClasses(void *DS, int numOfClasses, int *courses, int *c
 
 void Quit(void** DS)//is this right?
 {
-    delete(*DS);
-    *DS =NULL;
+
+    delete((CoursesManager*)*DS);
+    *DS = nullptr;
 }
