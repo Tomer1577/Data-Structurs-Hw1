@@ -402,7 +402,6 @@ void AVLTree<S,T>::Insert(const S &key,const  T &data)
     TreeNode<S,T> parent = GetNode(key);
     if (key == parent.key) {//item already exists
         throw ItemFound();
-        return;
     }
     TreeNode<S,T> newNode(key, data);
     if (key < parent.key) {
