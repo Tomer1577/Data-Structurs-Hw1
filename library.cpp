@@ -39,7 +39,7 @@ StatusType TimeViewed(void *DS, int courseID, int classID, int *timeViewed)
     {
         return INVALID_INPUT;
     }
-    return ((CoursesManager*)DS)->WatchClass(courseID,classID,timeViewed);
+    return ((CoursesManager*)DS)->TimeViewed(courseID,classID,timeViewed);
 }
 
 StatusType GetMostViewedClasses(void *DS, int numOfClasses, int *courses, int *classes)
@@ -48,7 +48,7 @@ StatusType GetMostViewedClasses(void *DS, int numOfClasses, int *courses, int *c
     {
         return INVALID_INPUT;
     }
-    return ((CoursesManager*)DS)->WatchClass(numOfClasses,courses,classes);
+    return ((CoursesManager*)DS)->GetMostViewedClasses(numOfClasses,courses,classes);
 }
 
 void Quit(void** DS)//is this right?
