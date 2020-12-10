@@ -1,7 +1,7 @@
 #ifndef WET1_EXCEPTION_H
 #define WET1_EXCEPTION_H
 
-#include <bits/exception.h>
+//#include <bits/exception.h>
 
 class Exception: public std::exception {};
 

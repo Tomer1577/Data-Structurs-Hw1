@@ -6,13 +6,13 @@ void *Init()
     return DS;
 }
 
-StatusType AddCourse (void *DS, int courseID, int numOfClasses);
+StatusType AddCourse (void *DS, int courseID, int numOfClasses)
 {
     if(DS == NULL)
     {
         return INVALID_INPUT;
     }
-    return DS->AddCourse(courseID,numOfClasses);
+    return ((CoursesManager*)DS)->AddCourse(courseID,numOfClasses);
 }
 
 StatusType RemoveCourse(void *DS, int courseID)
@@ -21,7 +21,7 @@ StatusType RemoveCourse(void *DS, int courseID)
     {
         return INVALID_INPUT;
     }
-    return DS->RemoveCourse(courseID);
+    return ((CoursesManager*)DS)->RemoveCourse(courseID);
 }
 
 StatusType WatchClass(void *DS, int courseID, int classID, int time)
@@ -30,7 +30,7 @@ StatusType WatchClass(void *DS, int courseID, int classID, int time)
     {
         return INVALID_INPUT;
     }
-    return DS->WatchClass(courseID,classID,time);
+    return ((CoursesManager*)DS)->WatchClass(courseID,classID,time);
 }
 
 StatusType TimeViewed(void *DS, int courseID, int classID, int *timeViewed)
@@ -39,7 +39,7 @@ StatusType TimeViewed(void *DS, int courseID, int classID, int *timeViewed)
     {
         return INVALID_INPUT;
     }
-    return DS->WatchClass(courseID,classID,timeViewed);
+    return ((CoursesManager*)DS)->WatchClass(courseID,classID,timeViewed);
 }
 
 StatusType GetMostViewedClasses(void *DS, int numOfClasses, int *courses, int *classes)
@@ -48,7 +48,7 @@ StatusType GetMostViewedClasses(void *DS, int numOfClasses, int *courses, int *c
     {
         return INVALID_INPUT;
     }
-    return DS->WatchClass(numOfClasses,courses,classes);
+    return ((CoursesManager*)DS)->WatchClass(numOfClasses,courses,classes);
 }
 
 void Quit(void** DS)//is this right?
