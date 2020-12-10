@@ -26,7 +26,7 @@ Array::~Array()
     delete[] data;
 }
 
-int Array::GetSize()
+int Array::GetSize() const
 {
-    return this->size;
+    return size;
 }

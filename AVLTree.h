@@ -127,7 +127,7 @@ public:
 
     bool operator==(const iterator& other) const
     {
-        if (this->current != other.current || this->top != other.top || stack.GetSize() != other.stack.GetSize()) {
+        if ((this->current != other.current) || (this->top != other.top) || (this->stack.GetSize() != other.stack.GetSize())) {
             return false;
         }
         for(int i = 0; i < stack.GetSize(); ++i) {
@@ -262,18 +262,18 @@ void AVLTree<S,T>::DestroyTree(std::shared_ptr<TreeNode<S,T>> &current)
 template <class S, class T>
 void AVLTree<S,T>::RollRight(TreeNode<S,T> &root)
 {
-    std::shared_ptr<TreeNode<S,T>> left = root->left;
-    std::shared_ptr<TreeNode<S,T>> swing = left->right;
-    root->connectLeft(*swing);
-    left->connectRight(*root);
+    TreeNode<S,T> left = *(root.left);
+    TreeNode<S,T> swing = *(left.right);
+    root.connectLeft(swing);
+    left.connectRight(root);
     left.top = nullptr;
 }
 
 template <class S, class T>
 void AVLTree<S,T>::RollLeft(TreeNode<S,T> &root)
 {
-    TreeNode<S,T> right = root.right;
-    TreeNode<S,T> swing = right.left;
+    TreeNode<S,T> right = *(root.right);
+    TreeNode<S,T> swing = *(right.left);
     root.connectRight(swing);
     right.connectLeft(root);
     right.top = nullptr;
@@ -342,7 +342,7 @@ TreeNode<S,T>& AVLTree<S,T>::GetNode(const S &key)
     std::shared_ptr<TreeNode<S,T>> parent = current;
     while(current != nullptr) {
         if (key == current->key) {
-            return current;
+            return *current;
         }
         parent = current;
         if (key < current->key) {
@@ -412,7 +412,7 @@ void AVLTree<S,T>::Insert(const S &key,const  T &data)
         assert(parent.right == nullptr);
         parent.connectRight(newNode);
     }
-    balanceUpwards(newNode);
+    BalanceUpwards(newNode);
 }
 
 template <class S, class T>
@@ -461,9 +461,9 @@ void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
         assert(toRemove.right != nullptr);
         std::shared_ptr<TreeNode<S,T>> temp = toRemove.top;
         if (isRightChild) {
-            toRemove.top->connectRight(toRemove.right);
+            toRemove.top->connectRight(*toRemove.right);
         } else {
-            toRemove.top->connectLeft(toRemove.right);
+            toRemove.top->connectLeft(*toRemove.right);
         }
         toRemove.top = nullptr;
         toRemove.right = nullptr;
@@ -474,9 +474,9 @@ void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
         assert(toRemove.left != nullptr);
         std::shared_ptr<TreeNode<S,T>> temp = toRemove.top;
         if (isRightChild) {
-            toRemove.top->connectRight(toRemove.left);
+            toRemove.top->connectRight(*toRemove.left);
         } else {
-            toRemove.top->connectLeft(toRemove.left);
+            toRemove.top->connectLeft(*toRemove.left);
         }
         toRemove.top = nullptr;
         toRemove.left = nullptr;

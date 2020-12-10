@@ -24,15 +24,15 @@ public:
             throw OutOfBounds();
         }
         return data[x];
-    };
+    }
     const ClassData& operator[](int x) const
     {
         if (x < 0 || x>size) {
             throw OutOfBounds();
         }
         return data[x];
-    };
-    int GetSize();
+    }
+    int GetSize() const;
 };
 
 
