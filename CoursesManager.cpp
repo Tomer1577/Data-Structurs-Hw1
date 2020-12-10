@@ -19,7 +19,7 @@ StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)////finish 
         (this->courses).GetItem(courseID) = classArray;// i dont need another try because i inserted him in this function
         return SUCCESS;//SUCCESS
     }
-    catch(const Exception::ItemFound & e)
+    catch(const ItemFound & e)
     {
         return FAILURE;
     }
@@ -56,7 +56,7 @@ StatusType CoursesManager::RemoveCourse(int courseID)
         (this->courses).Remove(courseID);
         return SUCCESS;//SUCCESS
     }
-    catch(const Exception::ItemNotFound &e)
+    catch(const ItemNotFound &e)
     {
         return FAILURE;
     }
@@ -94,7 +94,7 @@ StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
         }
         return SUCCESS;
     }
-    catch(const Exception::ItemNotFound& e)
+    catch(const ItemNotFound &e)
     {
         return FAILURE;
     }

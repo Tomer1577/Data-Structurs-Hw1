@@ -6,6 +6,7 @@
 #include "TwoList.h"
 #include "Array.h"
 #include "TimeTreeKey.h"
+#include "library.h"
 
 class CoursesManager
 {
