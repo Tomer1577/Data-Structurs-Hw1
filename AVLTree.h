@@ -1,6 +1,8 @@
 #ifndef AVLTREE_H
 #define AVLTREE_H
 
+#include <iostream>
+
 #include "TreeNode.h"
 #include "Array.h"
 #include "Exception.h"
@@ -398,6 +400,7 @@ void AVLTree<S,T>::Insert(const S &key,const  T &data)
 {
     if (root == nullptr) {
         root = std::shared_ptr<TreeNode<S,T>> (new TreeNode<S,T>(key, data));
+        return;
     }
     TreeNode<S,T> parent = GetNode(key);
     if (key == parent.key) {//item already exists
