@@ -402,19 +402,20 @@ void AVLTree<S,T>::Insert(const S &key,const  T &data)
         root = std::shared_ptr<TreeNode<S,T>> (new TreeNode<S,T>(key, data));
         return;
     }
-    TreeNode<S,T> parent = GetNode(key);
+    TreeNode<S,T>& parent = GetNode(key);
     if (key == parent.key) {//item already exists
         throw ItemFound();
     }
-    TreeNode<S,T> newNode(key, data);
+    TreeNode<S,T>* newNode = new TreeNode<S,T> (key, data);////////check for memory leak
     if (key < parent.key) {
         assert(parent.left == nullptr);
-        parent.connectLeft(newNode);
+        parent.connectLeft(*newNode);
     } else {
         assert(parent.right == nullptr);
-        parent.connectRight(newNode);
+        parent.connectRight(*newNode);
     }
-    BalanceUpwards(newNode);
+    BalanceUpwards(*newNode);
+    std::cout<<"fuck mivne"<<std::endl;
 }
 
 template <class S, class T>

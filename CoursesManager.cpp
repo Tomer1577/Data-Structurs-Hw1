@@ -1,6 +1,8 @@
 #include "CoursesManager.h"
 #include "library.h"
 #include "Exception.h"
+
+#include<iostream>
 StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)////finish test do dry and fix iterator
 {
     if(courseID<=0 || numOfClasses <= 0)
@@ -11,6 +13,7 @@ StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)////finish 
     {
         Array classArray(numOfClasses);
         (this->courses).Insert(courseID,classArray);
+        std::cout<<"here"<<std::endl;
         for(int i = 0; i < numOfClasses; i++)
         {
             (classArray[i]).pointer= (this->unwatched).PushFront(courseID,i);
