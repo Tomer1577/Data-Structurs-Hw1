@@ -13,7 +13,6 @@ StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)////finish 
     {
         Array classArray(numOfClasses);
         (this->courses).Insert(courseID,classArray);
-        std::cout<<"here"<<std::endl;
         for(int i = 0; i < numOfClasses; i++)
         {
             (classArray[i]).pointer= (this->unwatched).PushFront(courseID,i);

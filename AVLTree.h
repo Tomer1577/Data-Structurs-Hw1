@@ -415,7 +415,6 @@ void AVLTree<S,T>::Insert(const S &key,const  T &data)
         parent.connectRight(*newNode);
     }
     BalanceUpwards(*newNode);
-    std::cout<<"fuck mivne"<<std::endl;
 }
 
 template <class S, class T>
