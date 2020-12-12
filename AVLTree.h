@@ -69,7 +69,9 @@ private:
     iterator(const std::shared_ptr<TreeNode<S,T>>& current, int height):
         current(current), stack(height + 1), top(0)
     {
-        ++(*this);
+        if (current != nullptr) {
+            ++(*this);
+        }
     }
 
 public:
@@ -158,7 +160,9 @@ private:
     const_iterator(const std::shared_ptr<TreeNode<S,T>>& current, int height):
     current(current), stack(height + 1), top(0)
     {
-        ++(*this);
+        if (current != nullptr) {
+            ++(*this);
+        }
     }
 
 public:
@@ -408,12 +412,12 @@ void AVLTree<S,T>::Insert(const S &key,const  T &data)
     std::shared_ptr<TreeNode<S,T>> temp = nullptr;
     if (key < parent->key) {
         assert(parent->left == nullptr);
-        parent->left = new TreeNode<S,T> (key, data);
+        parent->left = std::shared_ptr<TreeNode<S,T>>(new TreeNode<S,T> (key, data));
         parent->left->top = parent;
         temp = parent->left;
     } else {
-        assert(parent.right == nullptr);
-        parent->right = new TreeNode<S,T> (key, data);
+        assert(parent->right == nullptr);
+        parent->right = std::shared_ptr<TreeNode<S,T>>(new TreeNode<S,T> (key, data));
         parent->right->top = parent;
         temp = parent->right;
     }
@@ -448,7 +452,7 @@ void AVLTree<S,T>::Remove(const S &key)//DANGEROUS
         }
         RemoveReplacer(toRemove);
     }
-    bool isRightChild = key > toRemove.top->key;
+    bool isRightChild = key > toRemove->top->key;
     if (toRemove->left == nullptr &&  toRemove->right == nullptr)
     {
         if (isRightChild) {
