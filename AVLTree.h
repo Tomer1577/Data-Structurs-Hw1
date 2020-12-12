@@ -67,7 +67,7 @@ private:
     int top;
     std::shared_ptr<TreeNode<S,T>> current;
 
-    iterator(std::shared_ptr<TreeNode<S,T>> current, int height):
+    iterator(const std::shared_ptr<TreeNode<S,T>>& current, int height):
         current(current), stack(height + 1), top(0)
     {
         ++(*this);
@@ -156,7 +156,7 @@ private:
     int top;
     std::shared_ptr<TreeNode<S,T>> current;
 
-    const_iterator(std::shared_ptr<TreeNode<S,T>> current, int height):
+    const_iterator(const std::shared_ptr<TreeNode<S,T>>& current, int height):
     current(current), stack(height + 1), top(0)
     {
         ++(*this);
