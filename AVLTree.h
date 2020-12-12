@@ -16,14 +16,13 @@ private:
     std::shared_ptr<TreeNode<S,T>> root;
 
     static void DestroyTree(std::shared_ptr<TreeNode<S,T>> &current);
-    static void RollRight(TreeNode<S,T> &root);
-    static void RollLeft(TreeNode<S,T> &root);
+    static void RollRight(std::shared_ptr<TreeNode<S,T>> &root);
+    static void RollLeft(std::shared_ptr<TreeNode<S,T>> &root);
 
-    void BalanceUpwards(TreeNode<S,T> &start);
+    void BalanceUpwards(std::shared_ptr<TreeNode<S,T>> start);
     void RemoveReplacer(TreeNode<S,T> &target);
 
-    TreeNode<S,T>& GetNode(const S &key);
-    const TreeNode<S,T>& GetNode(const S &key) const;
+    std::shared_ptr<TreeNode<S,T>> GetNode(const S &key);
 
 public:
 
@@ -262,51 +261,70 @@ void AVLTree<S,T>::DestroyTree(std::shared_ptr<TreeNode<S,T>> &current)
 }
 
 template <class S, class T>
-void AVLTree<S,T>::RollRight(TreeNode<S,T> &root)
+void AVLTree<S,T>::RollRight(std::shared_ptr<TreeNode<S,T>> &root)
 {
-    TreeNode<S,T> left = *(root.left);
-    TreeNode<S,T> swing = *(left.right);
-    root.connectLeft(swing);
-    left.connectRight(root);
-    left.top = nullptr;
-}
-
-template <class S, class T>
-void AVLTree<S,T>::RollLeft(TreeNode<S,T> &root)
-{
-    TreeNode<S,T> right = *(root.right);
-    TreeNode<S,T> swing = *(right.left);
-    root.connectRight(swing);
-    right.connectLeft(root);
-    right.top = nullptr;
-}
-
-template <class S, class T>
-void AVLTree<S,T>::BalanceUpwards(TreeNode<S,T> &start)
-{
-    TreeNode<S,T> index = start;
-    while(true) {
-        if (index.balanceFactor() == 2) {
-            if (index.left->balanceFactor() == -1) {
-                RollLeft(*(index.left));
-            }
-            RollRight(index);
-        } else if (index.balanceFactor() == -2) {
-            if (index.right->balanceFactor() == 1) {
-                RollRight(*(index.right));
-            }
-            RollLeft(index);
+    std::shared_ptr<TreeNode<S,T>> left = root->left;
+    std::shared_ptr<TreeNode<S,T>> swing = left->right;
+    root->left = swing;
+    swing->top = root;
+    left->right = root;
+    left->top = root->top;
+    root->top = left;
+    if (left->top != nullptr) {
+        if (left->top->right == root) {
+            left->top->right = left;
+        } else {
+            assert(left->top->left == root);
+            left->top->left = left;
         }
-        index.update_height();
-        if (index.top == nullptr) {
-            break;
-        }
-        index = *(index.top);
     }
 }
 
 template <class S, class T>
-void AVLTree<S,T>::RemoveReplacer(TreeNode<S,T> &target)
+void AVLTree<S,T>::RollLeft(std::shared_ptr<TreeNode<S,T>> &root)
+{
+    std::shared_ptr<TreeNode<S,T>> right = root->right;
+    std::shared_ptr<TreeNode<S,T>> swing = right->left;
+    root->right = swing;
+    swing->top = root;
+    right->right = root;
+    right->top = root->top;
+    root->top = right;
+    if (right->top != nullptr) {
+        if (right->top->right == root) {
+            right->top->right = right;
+        } else {
+            assert(right->top->left == root);
+            right->top->left = right;
+        }
+    }
+}
+
+template <class S, class T>
+void AVLTree<S,T>::BalanceUpwards(std::shared_ptr<TreeNode<S,T>> start)
+{
+    while(true) {
+        if (start->balanceFactor() == 2) {
+            if (start->left->balanceFactor() == -1) {
+                RollLeft(start->left);
+            }
+            RollRight(start);
+        } else if (start->balanceFactor() == -2) {
+            if (start->right->balanceFactor() == 1) {
+                RollRight(start->right);
+            }
+            RollLeft(start);
+        }
+        start->update_height();
+        if (start->top == nullptr) {
+            break;
+        }
+        start = start->top;
+    }
+}
+
+template <class S, class T>
+void AVLTree<S,T>::RemoveReplacer(TreeNode<S,T> &target)//DANGEROUS
 {
     assert(target.left != nullptr && target.right != nullptr);
     std::shared_ptr<TreeNode<S,T>> temp = target.right;
@@ -325,7 +343,7 @@ void AVLTree<S,T>::RemoveReplacer(TreeNode<S,T> &target)
         }
         temp->top = nullptr;
         temp->right = nullptr;
-        BalanceUpwards(*parent);
+        BalanceUpwards(parent);
     } else {
         parent->right = temp->right;
         if (temp->right != nullptr) {
@@ -333,31 +351,12 @@ void AVLTree<S,T>::RemoveReplacer(TreeNode<S,T> &target)
         }
         temp->top = nullptr;
         temp->right = nullptr;
-        BalanceUpwards(*parent);
+        BalanceUpwards(parent);
     }
 }
 
 template <class S, class T>
-TreeNode<S,T>& AVLTree<S,T>::GetNode(const S &key)
-{
-    std::shared_ptr<TreeNode<S,T>> current = root;
-    std::shared_ptr<TreeNode<S,T>> parent = current;
-    while(current != nullptr) {
-        if (key == current->key) {
-            return *current;
-        }
-        parent = current;
-        if (key < current->key) {
-            current = current->left;
-        } else {
-            current = current->right;
-        }
-    }
-    return *parent;
-}
-
-template <class S, class T>
-const TreeNode<S,T>& AVLTree<S,T>::GetNode(const S &key) const
+std::shared_ptr<TreeNode<S,T>> AVLTree<S,T>::GetNode(const S &key)
 {
     std::shared_ptr<TreeNode<S,T>> current = root;
     std::shared_ptr<TreeNode<S,T>> parent = current;
@@ -372,27 +371,27 @@ const TreeNode<S,T>& AVLTree<S,T>::GetNode(const S &key) const
             current = current->right;
         }
     }
-    return *parent;
+    return parent;
 }
 
 template <class S, class T>
 T& AVLTree<S,T>::GetItem(const S &key)
 {
-    TreeNode<S,T>& node =  GetNode(key);
-    if (node.key != key) {
+    std::shared_ptr<TreeNode<S,T>> ptr = GetNode(key);
+    if (ptr->key != key) {
         throw ItemNotFound();
     }
-    return node.data;
+    return ptr->data;
 }
 
 template <class S, class T>
 const T& AVLTree<S,T>::GetItem(const S &key) const
 {
-    TreeNode<S,T>& node =  GetNode(key);
-    if (node.key != key) {
+    std::shared_ptr<TreeNode<S,T>> ptr = GetNode(key);
+    if (ptr->key != key) {
         throw ItemNotFound();
     }
-    return node.data;
+    return ptr->data;
 }
 
 template <class S, class T>
@@ -402,28 +401,31 @@ void AVLTree<S,T>::Insert(const S &key,const  T &data)
         root = std::shared_ptr<TreeNode<S,T>> (new TreeNode<S,T>(key, data));
         return;
     }
-    TreeNode<S,T>& parent = GetNode(key);
-    if (key == parent.key) {//item already exists
+    std::shared_ptr<TreeNode<S,T>> CHECK1 = GetNode(key);
+    if (key == CHECK1->key) {
         throw ItemFound();
     }
-    TreeNode<S,T>* newNode = new TreeNode<S,T> (key, data);////////check for memory leak
-    if (key < parent.key) {
-        assert(parent.left == nullptr);
-        parent.connectLeft(*newNode);
+    std::shared_ptr<TreeNode<S,T>> temp = nullptr;
+    if (key < CHECK1->key) {
+        assert(CHECK1->left == nullptr);
+        CHECK1->left = new TreeNode<S,T> (key, data);
+        CHECK1->left->top = CHECK1;
+        temp = CHECK1->left;
     } else {
-        assert(parent.right == nullptr);
-        parent.connectRight(*newNode);
+        assert(CHECK1.right == nullptr);
+        CHECK1->right = new TreeNode<S,T> (key, data);
+        CHECK1->right->top = CHECK1;
+        temp = CHECK1->right;
     }
-    BalanceUpwards(*newNode);
+    BalanceUpwards(temp);
 }
 
 template <class S, class T>
-void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
+void AVLTree<S,T>::Remove(const S &key)//DANGEROUS
 {
     TreeNode<S,T> toRemove = GetNode(key);
-    if(toRemove.key != key) {//item not found
+    if(toRemove.key != key) {
         throw ItemNotFound();
-        return;
     }
     if (toRemove == *root) {
         if (root->left == nullptr && root->right == nullptr) {
@@ -456,7 +458,7 @@ void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
         }
         std::shared_ptr<TreeNode<S,T>> temp = toRemove.top;
         toRemove.top = nullptr;
-        BalanceUpwards(*temp);
+        BalanceUpwards(*temp);//DANGEROUS
         return;
     }
     if (toRemove.left == nullptr) {
@@ -469,7 +471,7 @@ void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
         }
         toRemove.top = nullptr;
         toRemove.right = nullptr;
-        BalanceUpwards(*temp);//note that right's subtree is unaffected by the function, so it can start with right
+        BalanceUpwards(*temp);//DANGEROUS
         return;
     }
     if (toRemove.right == nullptr) {
@@ -482,7 +484,7 @@ void AVLTree<S,T>::Remove(const S &key) //using the lecture's algorithm
         }
         toRemove.top = nullptr;
         toRemove.left = nullptr;
-        BalanceUpwards(*temp);//refer to the comment on (left == null) block
+        BalanceUpwards(*temp);//DANGEROUS
         return;
     }
     RemoveReplacer(toRemove);

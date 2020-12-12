@@ -55,16 +55,6 @@ public:
         int rightHeight = (right == nullptr)? NULL_HEIGHT : right->height;
         return leftHeight-rightHeight;
     }
-    void connectLeft(TreeNode& other)
-    {
-        other.top = std::shared_ptr<TreeNode>(this);
-        this->left = std::shared_ptr<TreeNode>(&other);
-    }
-    void connectRight(TreeNode& other)
-    {
-        other.top = std::shared_ptr<TreeNode>(this);
-        this->right = std::shared_ptr<TreeNode>(&other);
-    }
 };
 
 
