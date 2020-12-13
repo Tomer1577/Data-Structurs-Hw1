@@ -16,8 +16,8 @@ private:
     std::shared_ptr<TreeNode<S,T>> root;
 
     static void DestroyTree(std::shared_ptr<TreeNode<S,T>> &current);
-    static void RollRight(std::shared_ptr<TreeNode<S,T>> &root);
-    static void RollLeft(std::shared_ptr<TreeNode<S,T>> &root);
+    void RollRight(std::shared_ptr<TreeNode<S,T>> &root);
+    void RollLeft(std::shared_ptr<TreeNode<S,T>> &root);
 
     void BalanceUpwards(std::shared_ptr<TreeNode<S,T>> start);
     void RemoveReplacer(std::shared_ptr<TreeNode<S,T>> &target);
@@ -130,6 +130,9 @@ public:
 
     bool operator==(const iterator& other) const
     {
+        if (this->current == nullptr && other.current == nullptr) {
+            return true;
+        }
         if ((this->current != other.current) || (this->top != other.top) || (this->stack.GetSize() != other.stack.GetSize())) {
             return false;
         }
@@ -221,6 +224,9 @@ public:
 
     bool operator==(const const_iterator& other) const
     {
+        if (this->current == nullptr && other.current == nullptr) {
+            return true;
+        }
         if (this->current != other.current || this->top != other.top || stack.GetSize() != other.stack.GetSize()) {
             return false;
         }
@@ -270,10 +276,15 @@ void AVLTree<S,T>::RollRight(std::shared_ptr<TreeNode<S,T>> &root)
     std::shared_ptr<TreeNode<S,T>> left = root->left;
     std::shared_ptr<TreeNode<S,T>> swing = left->right;
     root->left = swing;
-    swing->top = root;
+    if (swing != nullptr) {
+        swing->top = root;
+    }
     left->right = root;
     left->top = root->top;
     root->top = left;
+    if (this->root == root) {
+        this->root = left;
+    }
     if (left->top != nullptr) {
         if (left->top->right == root) {
             left->top->right = left;
@@ -290,10 +301,15 @@ void AVLTree<S,T>::RollLeft(std::shared_ptr<TreeNode<S,T>> &root)
     std::shared_ptr<TreeNode<S,T>> right = root->right;
     std::shared_ptr<TreeNode<S,T>> swing = right->left;
     root->right = swing;
-    swing->top = root;
-    right->right = root;
+    if (swing != nullptr) {
+        swing->top = root;
+    }
+    right->left = root;
     right->top = root->top;
     root->top = right;
+    if (this->root == root) {
+        this->root = right;
+    }
     if (right->top != nullptr) {
         if (right->top->right == root) {
             right->top->right = right;
@@ -425,7 +441,7 @@ void AVLTree<S,T>::Insert(const S &key,const  T &data)
 }
 
 template <class S, class T>
-void AVLTree<S,T>::Remove(const S &key)//DANGEROUS
+void AVLTree<S,T>::Remove(const S &key)
 {
     std::shared_ptr<TreeNode<S,T>> toRemove = GetNode(key);
     if(toRemove->key != key) {

@@ -131,7 +131,7 @@ StatusType CoursesManager::GetMostViewedClasses(int numOfClasses, int *courses, 
     }
     try {
         int counter = 0;
-        for (const TimeTreeKey& item:this->classes) {//CRASHES HERE
+        for (const TimeTreeKey& item:this->classes) {
             if (counter == numOfClasses) {
                 return SUCCESS;
             }
