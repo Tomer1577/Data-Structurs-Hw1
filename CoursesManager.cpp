@@ -2,6 +2,8 @@
 #include "library.h"
 #include "Exception.h"
 
+#include <iostream>
+
 StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)////finish test do dry and fix iterator
 {
     if(courseID<=0 || numOfClasses <= 0)
@@ -46,6 +48,10 @@ StatusType CoursesManager::RemoveCourse(int courseID)
             }
         }
         this->courses.Remove(courseID);
+        if((this->courses).begin() == (this->courses).end())
+        {
+            std::cout<<"your right"<<std::endl;
+        }
         return SUCCESS;//SUCCESS
     }
     catch(const ItemNotFound &e)
@@ -79,6 +85,7 @@ StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
             TimeTreeKey newKey(currentCourse.classes[classID],courseID,classID);
             (this->classes).Insert(newKey,newKey);
         }
+        
         return SUCCESS;
     }
     catch(const ItemNotFound& e)
@@ -105,6 +112,7 @@ StatusType CoursesManager::TimeViewed(int courseID, int classID, int *timeViewed
     } catch (const ItemNotFound& x) {
         return FAILURE;
     }
+
     return SUCCESS;
 }
 
@@ -123,13 +131,15 @@ StatusType CoursesManager::GetMostViewedClasses(int numOfClasses, int *courses, 
             classes[counter] = item.classId;
             ++counter;
         }
-        for (const Course& item:this->courses) {
-            for (int i = 0; i < item.classes.GetSize(); ++i) {
+        
+        for (AVLTree<int,Course>::iterator item = (this->courses).begin(); item != (this->courses).end(); ++item)
+        {
+            for (int i = 0; i < (*item).classes.GetSize(); ++i) {
                 if (counter == numOfClasses) {
                     return SUCCESS;
                 }
-                if (item.classes[i] == 0) {
-                    courses[counter] = item.id;
+                if ((*item).classes[i] == 0) {
+                    courses[counter] = (*item).id;
                     classes[counter] = i;
                     ++counter;
                 }

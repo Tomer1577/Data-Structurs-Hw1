@@ -397,6 +397,7 @@ void AVLTree<S,T>::Insert(const S &key,const  T &data)
 {
     if (root == nullptr) {
         root = std::shared_ptr<TreeNode<S,T>> (new TreeNode<S,T>(key, data));
+        first = root;
         return;
     }
     std::shared_ptr<TreeNode<S,T>> parent = GetNode(key);
@@ -410,7 +411,7 @@ void AVLTree<S,T>::Insert(const S &key,const  T &data)
         parent->left->top = parent;
         temp = parent->left;
         if (parent == first) {
-            first = temp;
+            first = parent->left;
         }
     } else {
         assert(parent->right == nullptr);
