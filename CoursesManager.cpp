@@ -82,10 +82,14 @@ StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
             TimeTreeKey key(currentCourse.classes[classID],courseID,classID);
             this->classes.Remove(key);
             currentCourse.classes[classID] += time;
-            TimeTreeKey newKey(currentCourse.classes[classID],courseID,classID);
-            (this->classes).Insert(newKey,newKey);
         }
-        
+        else
+        {
+            currentCourse.classes[classID] = time;
+
+        }
+        TimeTreeKey newKey(currentCourse.classes[classID],courseID,classID);
+        (this->classes).Insert(newKey,newKey);
         return SUCCESS;
     }
     catch(const ItemNotFound& e)
@@ -112,7 +116,6 @@ StatusType CoursesManager::TimeViewed(int courseID, int classID, int *timeViewed
     } catch (const ItemNotFound& x) {
         return FAILURE;
     }
-
     return SUCCESS;
 }
 
