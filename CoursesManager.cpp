@@ -2,7 +2,6 @@
 #include "library.h"
 #include "Exception.h"
 
-#include<iostream>
 StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)////finish test do dry and fix iterator
 {
     if(courseID<=0 || numOfClasses <= 0)
@@ -11,15 +10,13 @@ StatusType CoursesManager::AddCourse (int courseID, int numOfClasses)////finish 
     }
     try
     {
-        Array classArray(numOfClasses);
-        (this->courses).Insert(courseID,classArray);
+        Course newCourse(courseID, numOfClasses);
         for(int i = 0; i < numOfClasses; i++)
         {
-            (classArray[i]).pointer= (this->unwatched).PushFront(courseID,i);
-            (classArray[i]).timeViewed = 0;
+            newCourse.classes[i] = 0;
         }
-        (this->courses).GetItem(courseID) = classArray;// i dont need another try because i inserted him in this function
-        return SUCCESS;//SUCCESS
+        (this->courses).Insert(courseID, newCourse);
+        return SUCCESS;
     }
     catch(const ItemFound & e)
     {
@@ -40,29 +37,22 @@ StatusType CoursesManager::RemoveCourse(int courseID)
     }
     try
     {
-        Array& currentCourse = (this->courses).GetItem(courseID);
-        for(int i = 0; i < currentCourse.GetSize(); i++)
+        Course& currentCourse = this->courses.GetItem(courseID);
+        for(int i = 0; i < currentCourse.classes.GetSize(); i++)
         {
-            if((currentCourse[i]).pointer != nullptr)
-            {
-                
-                (this->unwatched).PopPtr((currentCourse[i]).pointer);
-                (currentCourse[i]).pointer = nullptr;
-            }
-            else
-            {
-                TimeTreeKey key((currentCourse[i]).timeViewed,courseID,i);
-                (this->classes).Remove(key);
+            if (currentCourse.classes[i] != 0) {
+                TimeTreeKey key(currentCourse.classes[i],courseID,i);
+                this->classes.Remove(key);
             }
         }
-        (this->courses).Remove(courseID);
+        this->courses.Remove(courseID);
         return SUCCESS;//SUCCESS
     }
     catch(const ItemNotFound &e)
     {
         return FAILURE;
     }
-    catch(const std::exception &e)
+    catch(const std::bad_alloc &e)
     {
         return ALLOCATION_ERROR;
     }
@@ -73,26 +63,21 @@ StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
 {
     if(courseID <= 0 || classID <0 ||time <=0)
     {
-        return INVALID_INPUT;//fail statuse
+        return INVALID_INPUT;
     }
     try
     {
-        Array& currentCourse = (this->courses).GetItem(courseID);
-         if((currentCourse[classID]).pointer != nullptr)
-        {
-            (this->unwatched).PopPtr((currentCourse[classID]).pointer);
-            (currentCourse[classID]).pointer = nullptr;
-            TimeTreeKey key(time,courseID,classID);
-            (this->classes).Insert(key,key);
-            (currentCourse[classID]).timeViewed = time;
+        Course& currentCourse = this->courses.GetItem(courseID);
+        if (classID + 1 > currentCourse.classes.GetSize()) {
+            return INVALID_INPUT;
         }
-        else
-        {        //remove existing node and read with new time.
-            TimeTreeKey key((currentCourse[classID]).timeViewed,courseID,classID);
-            (this->classes).Remove(key);
-            (currentCourse[classID]).timeViewed += time;
-            TimeTreeKey newKey((currentCourse[classID]).timeViewed,courseID,classID);
-            (this->classes).Insert(newKey,newKey);// i dont need to check for dublicates
+        if (currentCourse.classes[classID] != 0)
+        {
+            TimeTreeKey key(currentCourse.classes[classID],courseID,classID);
+            this->classes.Remove(key);
+            currentCourse.classes[classID] += time;
+            TimeTreeKey newKey(currentCourse.classes[classID],courseID,classID);
+            (this->classes).Insert(newKey,newKey);
         }
         return SUCCESS;
     }
@@ -100,7 +85,7 @@ StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
     {
         return FAILURE;
     }
-    catch(const std::exception &e)
+    catch(const std::bad_alloc &e)
     {
         return ALLOCATION_ERROR;
     }
@@ -108,12 +93,11 @@ StatusType CoursesManager::WatchClass(int courseID, int classID, int time)
 
 StatusType CoursesManager::TimeViewed(int courseID, int classID, int *timeViewed)
 {
-    if (courseID <= 0) {
+    if (courseID <= 0 || classID < 0) {
         return INVALID_INPUT;
     }
     try {
-        Array& course = courses.GetItem(courseID);
-        *timeViewed = (course[classID]).timeViewed;
+        *timeViewed = courses.GetItem(courseID).classes[classID];
     } catch (const std::bad_alloc& x) {
         return ALLOCATION_ERROR;
     } catch (const OutOfBounds& x) {
@@ -139,13 +123,17 @@ StatusType CoursesManager::GetMostViewedClasses(int numOfClasses, int *courses, 
             classes[counter] = item.classId;
             ++counter;
         }
-        for (const TwoNode& item:unwatched) {
-            if (counter == numOfClasses) {
-                return SUCCESS;
+        for (const Course& item:this->courses) {
+            for (int i = 0; i < item.classes.GetSize(); ++i) {
+                if (counter == numOfClasses) {
+                    return SUCCESS;
+                }
+                if (item.classes[i] == 0) {
+                    courses[counter] = item.id;
+                    classes[counter] = i;
+                    ++counter;
+                }
             }
-            courses[counter] = item.data.courseId;
-            classes[counter] = item.data.classId;
-            ++counter;
         }
         if (counter != numOfClasses) {
             return FAILURE;

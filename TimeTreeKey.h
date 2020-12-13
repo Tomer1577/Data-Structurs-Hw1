@@ -23,7 +23,7 @@ struct TimeTreeKey
     {
         return (time == other.time)&&(courseId == other.courseId) && (classId == other.classId);
     }
-    bool operator<(const TimeTreeKey& other) const//can delete any comparisions not used in the end!!!
+    bool operator>(const TimeTreeKey& other) const
     {
         if(time != other.time)
         {
@@ -39,7 +39,7 @@ struct TimeTreeKey
         }
         return false;
     }
-    bool operator>(const TimeTreeKey& other) const
+    bool operator<(const TimeTreeKey& other) const
     {
         if(time != other.time)
         {
@@ -56,7 +56,7 @@ struct TimeTreeKey
         return false;
 
     }
-    bool operator>=(const TimeTreeKey& other) const
+    bool operator<=(const TimeTreeKey& other) const
     {
         if(time != other.time)
         {
@@ -72,7 +72,7 @@ struct TimeTreeKey
         }
         return true;
     }
-    bool operator<=(const TimeTreeKey& other) const
+    bool operator>=(const TimeTreeKey& other) const
     {
         if(time != other.time)
         {

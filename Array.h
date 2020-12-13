@@ -1,38 +1,61 @@
 #ifndef WET1_ARRAY_H
 #define WET1_ARRAY_H
 
-#include "ClassData.h"
 #include "Exception.h"
 
+template<class T>
 class Array {
 private:
-    ClassData* data;
+    T* data;
     int size;
 public:
     Array() = delete;
     explicit Array(int size) : size(size)
     {
-        data = new ClassData[size]();
+        data = new T[size]();
     }
-    Array(const Array &other);
-    Array& operator=(const Array &other);
-    ~Array();
+    Array(const Array &other): size(other.size)
+    {
+        data = new T[size]();
+        for (int i = 0; i < size; ++i) {
+            data[i] = other.data[i];
+        }
+    }
+    Array& operator=(const Array &other)
+    {
+        T* newData = new T[other.size]();
+        for (int i = 0; i < other.size; ++i) {
+            newData[i] = other.data[i];
+        }
 
-    ClassData& operator[](int x)
+        delete[] data;
+        size = other.size;
+        data = newData;
+        return *this;
+    }
+    ~Array()
     {
-        if (x < 0 || x>size) {
+        delete[] data;
+    }
+
+    T& operator[](int x)
+    {
+        if (x < 0 || x >= size) {
             throw OutOfBounds();
         }
         return data[x];
     }
-    const ClassData& operator[](int x) const
+    const T& operator[](int x) const
     {
-        if (x < 0 || x>size) {
+        if (x < 0 || x >= size) {
             throw OutOfBounds();
         }
         return data[x];
     }
-    int GetSize() const;
+    int GetSize() const
+    {
+        return size;
+    }
 };
 
 

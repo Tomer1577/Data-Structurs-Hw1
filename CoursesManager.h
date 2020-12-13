@@ -1,6 +1,7 @@
 #ifndef COURSESM
 #define COURSESM
 
+#include "Course.h"
 #include "TimeTreeKey.h"
 #include "AVLTree.h"
 #include "TwoList.h"
@@ -11,9 +12,8 @@
 class CoursesManager
 {
     private:
-    AVLTree<int,Array> courses;
+    AVLTree<int,Course> courses;
     AVLTree<TimeTreeKey,TimeTreeKey> classes;
-    TwoList unwatched;
 
     
     

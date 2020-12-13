@@ -4,8 +4,8 @@
 #include <iostream>
 
 #include "TreeNode.h"
-#include "Array.h"
 #include "Exception.h"
+#include "List.h"
 #include <memory>
 #include <cassert>
 
@@ -14,6 +14,7 @@ class AVLTree {
 private:
 
     std::shared_ptr<TreeNode<S,T>> root;
+    std::shared_ptr<TreeNode<S,T>> first;
 
     static void DestroyTree(std::shared_ptr<TreeNode<S,T>> &current);
     void RollRight(std::shared_ptr<TreeNode<S,T>> &root);
@@ -26,7 +27,7 @@ private:
 
 public:
 
-    AVLTree(): root(nullptr) {}
+    AVLTree(): root(nullptr), first(nullptr) {}
     AVLTree(const AVLTree& other) = delete;
     AVLTree & operator=(const AVLTree &other) = delete;
     ~AVLTree();
@@ -39,20 +40,20 @@ public:
     class iterator;
     iterator begin()
     {
-        return iterator(root, root->height);
+        return iterator(first);
     }
     iterator end()
     {
-        return iterator(nullptr, root->height);
+        return iterator(nullptr);
     }
     class const_iterator;
     const_iterator begin() const
     {
-        return const_iterator(root, root->height);
+        return const_iterator(first);
     }
     const_iterator end() const
     {
-        return const_iterator(nullptr, root->height);
+        return const_iterator(nullptr);
     }
 };
 
@@ -62,16 +63,12 @@ private:
 
     friend class AVLTree<S,T>;
 
-    Array stack;
-    int top;
     std::shared_ptr<TreeNode<S,T>> current;
+    List<int> stack;
 
-    iterator(const std::shared_ptr<TreeNode<S,T>>& current, int height):
-        current(current), stack(height + 1), top(0)
+    explicit iterator(const std::shared_ptr<TreeNode<S,T>>& current): current(current), stack()
     {
-        if (current != nullptr) {
-            ++(*this);
-        }
+        stack.PushFront(2);
     }
 
 public:
@@ -92,29 +89,31 @@ public:
             if (current == nullptr) {
                 return *this;
             }
-            if (stack[top].timeViewed == 0) {
-                stack[top].timeViewed = 1;
-                if (current->right != nullptr) {
-                    current = current->right;
-                    ++top;
-                }
-                continue;
-            }
-            if (stack[top].timeViewed == 1) {
-                stack[top].timeViewed = 2;
-                return *this;
-            }
-            if (stack[top].timeViewed == 2) {
-                stack[top].timeViewed = 3;
+            if (stack.Front() == 0) {
+                stack.Front() = 1;
                 if (current->left != nullptr) {
                     current = current->left;
-                    ++top;
+                    stack.PushFront(0);
                 }
                 continue;
             }
-            if (stack[top].timeViewed == 3) {
-                stack[top].timeViewed = 0;
-                --top;
+            if (stack.Front() == 1) {
+                stack.Front() = 2;
+                return *this;
+            }
+            if (stack.Front() == 2) {
+                stack.Front() = 3;
+                if (current->right != nullptr) {
+                    current = current->right;
+                    stack.PushFront(0);
+                }
+                continue;
+            }
+            if (stack.Front() == 3) {
+                stack.PopFront();
+                if (stack.IsEmpty()) {
+                    stack.PushFront(1);
+                }
                 current = current->top;
                 continue;
             }
@@ -123,25 +122,14 @@ public:
     iterator operator++(int)
     {
         assert(current != nullptr);
-        iterator output = *this;
+        iterator output(*this);
         ++(*this);
         return output;
     }
 
     bool operator==(const iterator& other) const
     {
-        if (this->current == nullptr && other.current == nullptr) {
-            return true;
-        }
-        if ((this->current != other.current) || (this->top != other.top) || (this->stack.GetSize() != other.stack.GetSize())) {
-            return false;
-        }
-        for(int i = 0; i < stack.GetSize(); ++i) {
-            if (stack[i].timeViewed != other.stack[i].timeViewed) {
-                return false;
-            }
-        }
-        return true;
+        return current == other.current;
     }
     bool operator!=(const iterator& other) const
     {
@@ -152,20 +140,15 @@ public:
 template <class S, class T>
 class AVLTree<S,T>::const_iterator {
 private:
-private:
 
     friend class AVLTree<S,T>;
 
-    Array stack;
-    int top;
     std::shared_ptr<TreeNode<S,T>> current;
+    List<int> stack;
 
-    const_iterator(const std::shared_ptr<TreeNode<S,T>>& current, int height):
-    current(current), stack(height + 1), top(0)
+    explicit const_iterator(const std::shared_ptr<TreeNode<S,T>>& current): current(current), stack()
     {
-        if (current != nullptr) {
-            ++(*this);
-        }
+        stack.PushFront(2);
     }
 
 public:
@@ -186,29 +169,31 @@ public:
             if (current == nullptr) {
                 return *this;
             }
-            if (stack[top].timeViewed == 0) {
-                stack[top].timeViewed = 1;
+            if (stack.Front() == 0) {
+                stack.Front() = 1;
                 if (current->right != nullptr) {
                     current = current->right;
-                    ++top;
+                    stack.PushFront(0);
                 }
                 continue;
             }
-            if (stack[top].timeViewed == 1) {
-                stack[top].timeViewed = 2;
+            if (stack.Front() == 1) {
+                stack.Front() = 2;
                 return *this;
             }
-            if (stack[top].timeViewed == 2) {
-                stack[top].timeViewed = 3;
+            if (stack.Front() == 2) {
+                stack.Front() = 3;
                 if (current->left != nullptr) {
                     current = current->left;
-                    ++top;
+                    stack.PushFront(0);
                 }
                 continue;
             }
-            if (stack[top].timeViewed == 3) {
-                stack[top].timeViewed = 0;
-                --top;
+            if (stack.Front() == 3) {
+                stack.PopFront();
+                if (stack.IsEmpty()) {
+                    stack.PushFront(1);
+                }
                 current = current->top;
                 continue;
             }
@@ -224,18 +209,7 @@ public:
 
     bool operator==(const const_iterator& other) const
     {
-        if (this->current == nullptr && other.current == nullptr) {
-            return true;
-        }
-        if (this->current != other.current || this->top != other.top || stack.GetSize() != other.stack.GetSize()) {
-            return false;
-        }
-        for(int i = 0; i < stack.GetSize(); ++i) {
-            if (stack[i].timeViewed != other.stack[i].timeViewed) {
-                return false;
-            }
-        }
-        return true;
+        return current == other.current;
     }
     bool operator!=(const const_iterator& other) const
     {
@@ -248,6 +222,7 @@ AVLTree<S,T>::~AVLTree()
 {
     DestroyTree(root);
     root = nullptr;
+    first = nullptr;
 }
 
 template <class S, class T>
@@ -273,6 +248,7 @@ void AVLTree<S,T>::DestroyTree(std::shared_ptr<TreeNode<S,T>> &current)
 template <class S, class T>
 void AVLTree<S,T>::RollRight(std::shared_ptr<TreeNode<S,T>> &root)
 {
+    assert(root->balanceFactor() == 2 || root->balanceFactor() == 1);
     std::shared_ptr<TreeNode<S,T>> left = root->left;
     std::shared_ptr<TreeNode<S,T>> swing = left->right;
     root->left = swing;
@@ -298,7 +274,9 @@ void AVLTree<S,T>::RollRight(std::shared_ptr<TreeNode<S,T>> &root)
 template <class S, class T>
 void AVLTree<S,T>::RollLeft(std::shared_ptr<TreeNode<S,T>> &root)
 {
+    assert(root->balanceFactor() == -2 || root->balanceFactor() == -1);
     std::shared_ptr<TreeNode<S,T>> right = root->right;
+    assert(right != nullptr && right->right != nullptr);
     std::shared_ptr<TreeNode<S,T>> swing = right->left;
     root->right = swing;
     if (swing != nullptr) {
@@ -431,9 +409,12 @@ void AVLTree<S,T>::Insert(const S &key,const  T &data)
         parent->left = std::shared_ptr<TreeNode<S,T>>(new TreeNode<S,T> (key, data));
         parent->left->top = parent;
         temp = parent->left;
+        if (parent == first) {
+            first = temp;
+        }
     } else {
         assert(parent->right == nullptr);
-        parent->right = std::shared_ptr<TreeNode<S,T>>(new TreeNode<S,T> (key, data));
+        parent->right = std::shared_ptr<TreeNode<S,T>>(new TreeNode<S,T>(key, data));
         parent->right->top = parent;
         temp = parent->right;
     }
@@ -450,11 +431,13 @@ void AVLTree<S,T>::Remove(const S &key)
     if (toRemove == root) {
         if (root->left == nullptr && root->right == nullptr) {
             root = nullptr;
+            first = nullptr;
             return;
         }
         if (root->left == nullptr)  {
-            assert(root->right != nullptr);
+            assert(root->right != nullptr && root == first);
             root = root->right;
+            first = root ->right;
             root->top->right = nullptr;
             root->top = nullptr;
             return;
@@ -469,24 +452,29 @@ void AVLTree<S,T>::Remove(const S &key)
         RemoveReplacer(toRemove);
     }
     bool isRightChild = key > toRemove->top->key;
+    std::shared_ptr<TreeNode<S,T>> temp = toRemove->top;
     if (toRemove->left == nullptr &&  toRemove->right == nullptr)
     {
+        if (toRemove == first) {
+            first = toRemove->top;
+        }
         if (isRightChild) {
             toRemove->top->right = nullptr;
         } else {
             toRemove->top->left = nullptr;
         }
-        std::shared_ptr<TreeNode<S,T>> temp = toRemove->top;
         toRemove->top = nullptr;
         BalanceUpwards(temp);
         return;
     }
     if (toRemove->left == nullptr) {
         assert(toRemove->right != nullptr);
-        std::shared_ptr<TreeNode<S,T>> temp = toRemove->top;
         if (isRightChild) {
             toRemove->top->right = toRemove->right;
         } else {
+            if (toRemove == first) {
+                first = toRemove->right;
+            }
             toRemove->top->left = toRemove->right;
         }
         toRemove->right->top = toRemove->top;
@@ -497,7 +485,6 @@ void AVLTree<S,T>::Remove(const S &key)
     }
     if (toRemove->right == nullptr) {
         assert(toRemove->left != nullptr);
-        std::shared_ptr<TreeNode<S,T>> temp = toRemove->top;
         if (isRightChild) {
             toRemove->top->right = toRemove->left;
         } else {
