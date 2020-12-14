@@ -276,7 +276,7 @@ void AVLTree<S,T>::RollLeft(std::shared_ptr<TreeNode<S,T>> &root)
 {
     assert(root->balanceFactor() == -2 || root->balanceFactor() == -1);
     std::shared_ptr<TreeNode<S,T>> right = root->right;
-    assert(right != nullptr && right->right != nullptr);
+    assert(right != nullptr);
     std::shared_ptr<TreeNode<S,T>> swing = right->left;
     root->right = swing;
     if (swing != nullptr) {
