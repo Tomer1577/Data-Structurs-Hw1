@@ -48,11 +48,7 @@ StatusType CoursesManager::RemoveCourse(int courseID)
             }
         }
         this->courses.Remove(courseID);
-        if((this->courses).begin() == (this->courses).end())
-        {
-            std::cout<<"your right"<<std::endl;
-        }
-        return SUCCESS;//SUCCESS
+        return SUCCESS;
     }
     catch(const ItemNotFound &e)
     {
