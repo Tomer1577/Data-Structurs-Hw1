@@ -444,8 +444,8 @@ void AVLTree<S,T>::Remove(const S &key)
         }
         if (root->left == nullptr)  {
             assert(root->right != nullptr && root == first);
-            root = root->right;
             first = root ->right;
+            root = root->right;
             root->top->right = nullptr;
             root->top = nullptr;
             return;
